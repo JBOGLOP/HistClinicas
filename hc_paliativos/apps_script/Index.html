@@ -27,7 +27,7 @@ body{font-family:'Source Sans 3',system-ui,sans-serif;background:var(--bg);color
 .header-actions button:disabled{opacity:.5;cursor:not-allowed}
 .container{max-width:1200px;margin:0 auto;padding:14px;display:grid;grid-template-columns:280px 1fr;gap:14px}
 @media(max-width:900px){.container{grid-template-columns:1fr}}
-.sidebar{background:var(--card);border-radius:10px;padding:14px;box-shadow:0 1px 3px rgba(0,0,0,.08);position:sticky;top:80px;align-self:start;max-height:calc(100vh - 100px);overflow-y:auto}
+.sidebar{background:var(--card);border-radius:10px;padding:14px;box-shadow:0 1px 3px rgba(0,0,0,.08);position:sticky;top:calc(var(--header-h,70px) + 10px);align-self:start;max-height:calc(100vh - var(--header-h,70px) - 30px);overflow-y:auto}
 .sidebar h3{font-family:'Merriweather',serif;font-size:13px;color:var(--primary);margin-bottom:8px;padding-bottom:6px;border-bottom:1px solid var(--border)}
 .patient-search{width:100%;padding:8px 10px;border:1px solid var(--border);border-radius:6px;margin-bottom:8px;font-size:13px}
 .patient-list{max-height:200px;overflow-y:auto;border:1px solid var(--border);border-radius:6px;margin-bottom:8px}
@@ -48,7 +48,7 @@ body{font-family:'Source Sans 3',system-ui,sans-serif;background:var(--bg);color
 .context-info{background:var(--section-bg);padding:8px;border-radius:6px;font-size:11px;margin-bottom:8px}
 .context-info strong{color:var(--primary)}
 .main-content{min-width:0}
-.nav-tabs{display:flex;flex-wrap:wrap;gap:4px;margin-bottom:14px;background:var(--card);padding:8px;border-radius:10px;box-shadow:0 1px 3px rgba(0,0,0,.08)}
+.nav-tabs{display:flex;flex-wrap:wrap;gap:4px;margin-bottom:14px;background:var(--card);padding:8px;border-radius:10px;box-shadow:0 2px 8px rgba(0,0,0,.12);position:sticky;top:var(--header-h,70px);z-index:90}
 .nav-tab{padding:8px 12px;border:none;background:none;cursor:pointer;font-size:12px;font-weight:600;color:var(--text-light);border-radius:6px;transition:.2s;white-space:nowrap}
 .nav-tab:hover{background:var(--section-bg);color:var(--primary)}
 .nav-tab.active{background:var(--primary);color:#fff}
@@ -102,6 +102,13 @@ body{font-family:'Source Sans 3',system-ui,sans-serif;background:var(--bg);color
 .toast.warning{background:var(--warning)}
 @keyframes slideUp{from{transform:translateY(20px);opacity:0}to{transform:translateY(0);opacity:1}}
 .dn4-grid{display:grid;grid-template-columns:1fr 1fr;gap:8px}
+.tab-actions{display:flex;justify-content:flex-end;gap:8px;margin-bottom:10px;flex-wrap:wrap}
+.copy-btn{background:var(--accent);color:#fff;border:none;padding:7px 14px;border-radius:6px;cursor:pointer;font-size:12px;font-weight:600;display:inline-flex;align-items:center;gap:6px;transition:.2s}
+.copy-btn:hover{background:#229954}
+.copy-btn.secondary{background:var(--primary-light)}
+.copy-btn.secondary:hover{background:var(--primary)}
+.copy-preview{margin-top:12px;background:#f8f9fa;border:1px solid var(--border);border-radius:6px;padding:10px;font-family:'Courier New',Consolas,monospace;font-size:11px;white-space:pre;overflow-x:auto;max-height:300px;overflow-y:auto;display:none}
+.copy-preview.show{display:block}
 /* Medication module */
 .med-entry{background:#f8f9fa;border:1px solid var(--border);border-radius:8px;padding:14px;margin-bottom:10px;position:relative}
 .med-entry .med-header{display:flex;align-items:center;justify-content:space-between;margin-bottom:10px}
@@ -161,6 +168,7 @@ body{font-size:10px;background:#fff;-webkit-print-color-adjust:exact;print-color
     <button onclick="savePaciente()" class="save-btn no-print" id="btnSavePaciente"><span id="btnSavePacienteText">💾 Guardar paciente</span></button>
     <button onclick="newEvolucion()" class="no-print">📝 Nueva evolución</button>
     <button onclick="saveEvolucion()" class="save-btn no-print" id="btnSaveEvolucion"><span id="btnSaveEvolucionText">💾 Guardar evolución</span></button>
+    <button onclick="copyAll()" class="no-print">📋 Copiar todo</button>
     <button onclick="exportPDF()" class="no-print">🖨 Imprimir/PDF</button>
   </div>
 </div>
@@ -271,6 +279,11 @@ body{font-size:10px;background:#fff;-webkit-print-color-adjust:exact;print-color
 
     <!-- TAB: HISTORIA CLÍNICA -->
     <div class="tab-content" id="tab-hc">
+      <div class="tab-actions no-print">
+        <button class="copy-btn secondary" onclick="togglePreview('hcPreview', buildHistoriaText())">👁 Vista previa</button>
+        <button class="copy-btn" onclick="copyHistoria()">📋 Copiar Historia Clínica</button>
+      </div>
+      <pre class="copy-preview" id="hcPreview"></pre>
       <div class="card">
         <div class="card-title"><span class="icon">🎯</span> Motivo de Consulta</div>
         <div class="form-group full-width"><textarea id="motivo_consulta" rows="3" placeholder="Describa el motivo de consulta en palabras del paciente/cuidador..."></textarea></div>
@@ -305,6 +318,11 @@ body{font-size:10px;background:#fff;-webkit-print-color-adjust:exact;print-color
 
     <!-- TAB: EXAMEN FÍSICO -->
     <div class="tab-content" id="tab-ef">
+      <div class="tab-actions no-print">
+        <button class="copy-btn secondary" onclick="togglePreview('efPreview', buildExamenText())">👁 Vista previa</button>
+        <button class="copy-btn" onclick="copyExamen()">📋 Copiar Examen Físico</button>
+      </div>
+      <pre class="copy-preview" id="efPreview"></pre>
       <div class="card">
         <div class="card-title"><span class="icon">📊</span> Signos Vitales</div>
         <div class="form-grid cols-4">
@@ -473,6 +491,11 @@ body{font-size:10px;background:#fff;-webkit-print-color-adjust:exact;print-color
     <div class="tab-content" id="tab-dx">
       <div class="card">
         <div class="card-title"><span class="icon">🔍</span> Resumen de Escalas Aplicadas</div>
+        <div class="tab-actions no-print">
+          <button class="copy-btn secondary" onclick="updateResumenEscalas();togglePreview('escPreview', buildEscalasText())">👁 Vista previa texto</button>
+          <button class="copy-btn" onclick="updateResumenEscalas();copyEscalas()">📋 Copiar resumen (tabla)</button>
+        </div>
+        <pre class="copy-preview" id="escPreview"></pre>
         <div id="resumen-escalas" style="font-size:13px"><p style="color:var(--text-light)">Las escalas se actualizan automáticamente.</p></div>
       </div>
       <div class="card">
@@ -1641,6 +1664,263 @@ function updateSubtitle() {
 }
 
 // =============================================================
+// COPY-AS-TEXT (HC, Examen Físico, Resumen escalas, Todo)
+// =============================================================
+function fieldValue(id) {
+  var el = document.getElementById(id);
+  return el ? String(el.value || '').trim() : '';
+}
+
+function textOf(id) {
+  var el = document.getElementById(id);
+  return el ? String(el.textContent || '').trim() : '';
+}
+
+function copyToClipboard(text) {
+  function fallback() {
+    var ta = document.createElement('textarea');
+    ta.value = text;
+    ta.style.position = 'fixed'; ta.style.top = '-9999px'; ta.style.opacity = '0';
+    document.body.appendChild(ta);
+    ta.focus(); ta.select();
+    try {
+      var ok = document.execCommand('copy');
+      showToast(ok ? '📋 Copiado al portapapeles' : 'No se pudo copiar', ok ? '' : 'error');
+    } catch (e) { showToast('No se pudo copiar', 'error'); }
+    document.body.removeChild(ta);
+  }
+  if (navigator.clipboard && navigator.clipboard.writeText) {
+    navigator.clipboard.writeText(text).then(
+      function() { showToast('📋 Copiado al portapapeles'); },
+      function() { fallback(); }
+    );
+  } else {
+    fallback();
+  }
+}
+
+function togglePreview(previewId, text) {
+  var el = document.getElementById(previewId);
+  if (!el) return;
+  if (el.classList.contains('show')) { el.classList.remove('show'); return; }
+  el.textContent = text;
+  el.classList.add('show');
+}
+
+function buildHeaderText() {
+  var nombre = [fieldValue('nombre1'), fieldValue('nombre2'), fieldValue('apellido1'), fieldValue('apellido2')].filter(Boolean).join(' ');
+  var doc = (fieldValue('tipo_doc') + ' ' + fieldValue('num_doc')).trim();
+  var fecha = fieldValue('fecha_atencion');
+  return [
+    '════════════════════════════════════════════',
+    'PACIENTE: ' + (nombre || '—') + '   DOC: ' + (doc || '—'),
+    'FECHA ATENCIÓN: ' + (fecha || '—') + '   TIPO: ' + (fieldValue('tipo_atencion') || '—'),
+    'INSTITUCIÓN: ' + (fieldValue('institucion') || '—') + '   PROGRAMA: ' + (fieldValue('programa') || '—'),
+    'PROFESIONAL: ' + (fieldValue('medico_nombre') || '—') + '   RM: ' + (fieldValue('medico_rm') || '—') + '   ESP: ' + (fieldValue('medico_esp') || '—'),
+    '════════════════════════════════════════════'
+  ].join('\n');
+}
+
+function buildIdentText() {
+  var lines = [];
+  lines.push('-- IDENTIFICACIÓN --');
+  lines.push('Edad: ' + (fieldValue('edad') || '—') + '   Sexo: ' + (fieldValue('sexo') || '—') + '   Nac: ' + (fieldValue('fecha_nac') || '—'));
+  lines.push('EPS: ' + (fieldValue('eps') || '—') + ' (' + (fieldValue('regimen') || '—') + ')   Tel: ' + (fieldValue('telefono') || '—'));
+  lines.push('Dirección: ' + (fieldValue('direccion') || '—') + '  ' + (fieldValue('municipio') || '') + ', ' + (fieldValue('departamento') || '') + ' (' + (fieldValue('zona') || '') + ')');
+  lines.push('Cuidador: ' + (fieldValue('cuidador_nombre') || '—') + ' (' + (fieldValue('cuidador_parentesco') || '—') + ')  Tel: ' + (fieldValue('cuidador_tel') || '—'));
+  lines.push('Tipo paciente: ' + (fieldValue('tipo_paciente') || '—') + '   Estado: ' + (fieldValue('estado_paciente') || '—') + '   Fase: ' + (fieldValue('fase_enfermedad') || '—'));
+  if (fieldValue('dx_oncol')) lines.push('Dx oncológico: ' + fieldValue('dx_oncol'));
+  lines.push('Dx principal: ' + (fieldValue('dx_principal') || '—'));
+  lines.push('Voluntad anticipada: ' + (fieldValue('voluntad_anticipada') || '—'));
+  return lines.join('\n');
+}
+
+function buildHistoriaText() {
+  var lines = [];
+  lines.push('════════════════ HISTORIA CLÍNICA ════════════════');
+  lines.push(buildHeaderText());
+  lines.push('');
+  lines.push(buildIdentText());
+  lines.push('');
+  lines.push('-- MOTIVO DE CONSULTA --');
+  lines.push(fieldValue('motivo_consulta') || '—');
+  lines.push('');
+  lines.push('-- ENFERMEDAD ACTUAL --');
+  lines.push(fieldValue('enfermedad_actual') || '—');
+  lines.push('');
+  lines.push('-- ANTECEDENTES --');
+  lines.push('Patológicos:    ' + (fieldValue('ant_patologicos') || '—'));
+  lines.push('Farmacológicos: ' + (fieldValue('ant_farmacologicos') || '—'));
+  lines.push('Alérgicos:      ' + (fieldValue('ant_alergicos') || '—'));
+  lines.push('Quirúrgicos:    ' + (fieldValue('ant_quirurgicos') || '—'));
+  lines.push('Familiares:     ' + (fieldValue('ant_familiares') || '—'));
+  lines.push('Tóxicos:        ' + (fieldValue('ant_toxicos') || '—'));
+  lines.push('Transfusionales:' + (fieldValue('ant_transfusionales') || '—'));
+  if (fieldValue('ant_oncologicos')) {
+    lines.push('Oncológicos:    ' + fieldValue('ant_oncologicos'));
+  }
+  lines.push('');
+  lines.push('-- VALORACIÓN PSICOSOCIAL Y ESPIRITUAL --');
+  lines.push('Red de apoyo:           ' + (fieldValue('red_apoyo') || '—'));
+  lines.push('Aspectos espirituales:  ' + (fieldValue('aspectos_espirituales') || '—'));
+  lines.push('Socioeconómica:         ' + (fieldValue('socioeconomica') || '—'));
+  lines.push('Información/comunicación:' + (fieldValue('info_comunicacion') || '—'));
+  return lines.join('\n');
+}
+
+function buildExamenText() {
+  var lines = [];
+  lines.push('════════════════ EXAMEN FÍSICO ════════════════');
+  lines.push(buildHeaderText());
+  lines.push('');
+  lines.push('-- SIGNOS VITALES --');
+  // Formato tabular con tabs (Excel/Word friendly)
+  lines.push('Parámetro\tValor\tUnidad');
+  lines.push('FC\t' + (fieldValue('sv_fc') || '—') + '\tlpm');
+  lines.push('FR\t' + (fieldValue('sv_fr') || '—') + '\trpm');
+  lines.push('PA\t' + (fieldValue('sv_pa') || '—') + '\tmmHg');
+  lines.push('T°\t' + (fieldValue('sv_temp') || '—') + '\t°C');
+  lines.push('SatO2\t' + (fieldValue('sv_sato2') || '—') + '\t%');
+  lines.push('Peso\t' + (fieldValue('sv_peso') || '—') + '\tkg');
+  lines.push('Talla\t' + (fieldValue('sv_talla') || '—') + '\tcm');
+  lines.push('IMC\t' + (fieldValue('sv_imc') || '—') + '\tkg/m²');
+  lines.push('');
+  lines.push('-- EXAMEN FÍSICO POR SISTEMAS --');
+  lines.push('Estado general:        ' + (fieldValue('ef_general') || '—'));
+  lines.push('Cabeza y cuello:       ' + (fieldValue('ef_cabeza') || '—'));
+  lines.push('Tórax/cardiopulmonar:  ' + (fieldValue('ef_torax') || '—'));
+  lines.push('Abdomen:               ' + (fieldValue('ef_abdomen') || '—'));
+  lines.push('Extremidades/MSK:      ' + (fieldValue('ef_extremidades') || '—'));
+  lines.push('Neurológico:           ' + (fieldValue('ef_neuro') || '—'));
+  lines.push('Piel/mucosas:          ' + (fieldValue('ef_piel') || '—'));
+  if (fieldValue('ef_otros')) {
+    lines.push('Otros hallazgos:       ' + fieldValue('ef_otros'));
+  }
+  return lines.join('\n');
+}
+
+function buildEscalasText() {
+  // Tabla con tabs: pegable en Excel (columnas) o Word (tabla)
+  var rows = [['Escala', 'Resultado', 'Interpretación']];
+  var scales = [
+    {name:'PPS',         score:textOf('pps-score'),     suf:'%',    interp:textOf('pps-interp')},
+    {name:'Karnofsky',   score:textOf('kps-score'),     suf:'%',    interp:textOf('kps-interp')},
+    {name:'ECOG',        score:textOf('ecog-score'),    suf:'',     interp:textOf('ecog-interp')},
+    {name:'Barthel',     score:textOf('barthel-score'), suf:'/100', interp:textOf('barthel-interp')},
+    {name:'ESAS Total',  score:textOf('esas-total'),    suf:'/100', interp:textOf('esas-interp')},
+    {name:'EVA reposo',  score:textOf('eva-rest-val'),  suf:'/10',  interp:''},
+    {name:'EVA mov',     score:textOf('eva-mov-val'),   suf:'/10',  interp:''},
+    {name:'EVA irrupt',  score:textOf('eva-irr-val'),   suf:'/10',  interp:''},
+    {name:'DN4',         score:textOf('dn4-score'),     suf:'/10',  interp:textOf('dn4-interp')},
+    {name:'PPI',         score:textOf('ppi-score'),     suf:'',     interp:textOf('ppi-interp')},
+    {name:'NECPAL',      score:'',                       suf:'',     interp:textOf('necpal-interp')},
+    {name:'SPICT',       score:textOf('spict-score'),   suf:'',     interp:textOf('spict-interp')},
+    {name:'CAM',         score:'',                       suf:'',     interp:textOf('cam-interp')},
+    {name:'Glasgow',     score:textOf('glasgow-score'), suf:'/15',  interp:textOf('glasgow-interp')},
+    {name:'Norton',      score:textOf('norton-score'),  suf:'/20',  interp:textOf('norton-interp')},
+    {name:'IDC-Pal',     score:'',                       suf:'',     interp:textOf('idc-interp')}
+  ];
+  scales.forEach(function(s) {
+    var val = s.score ? (s.score + s.suf) : '';
+    rows.push([s.name, val, s.interp]);
+  });
+  // Ancho fijo para vista pretty (en lugar de solo TSV)
+  var colW = [16, 14, 70];
+  function pad(s, w) {
+    s = String(s == null ? '' : s);
+    if (s.length >= w) return s.substring(0, w);
+    return s + new Array(w - s.length + 1).join(' ');
+  }
+  var pretty = rows.map(function(r, i) {
+    var line = pad(r[0], colW[0]) + pad(r[1], colW[1]) + r[2];
+    return line;
+  });
+  // Separador después del header
+  pretty.splice(1, 0, new Array(colW[0] + colW[1] + 60).join('─'));
+
+  // ESAS desglose
+  var esasDetail = [];
+  ESAS_ITEMS.forEach(function(it) {
+    var v = textOf('esas-' + it.id + '-val') || '0';
+    esasDetail.push(pad(it.name, 24) + v + '/10');
+  });
+
+  var lines = [];
+  lines.push('════════════════ RESUMEN DE ESCALAS ════════════════');
+  lines.push(buildHeaderText());
+  lines.push('');
+  lines.push('-- TABLA DE ESCALAS (ancho fijo, copiar a Word) --');
+  lines.push(pretty.join('\n'));
+  lines.push('');
+  lines.push('-- TABLA TSV (pegar en Excel/Sheets) --');
+  lines.push(rows.map(function(r) { return r.join('\t'); }).join('\n'));
+  lines.push('');
+  lines.push('-- ESAS DETALLADO --');
+  lines.push(esasDetail.join('\n'));
+  return lines.join('\n');
+}
+
+function buildDolorText() {
+  var lines = [];
+  lines.push('-- DOLOR --');
+  lines.push('EVA reposo: ' + (textOf('eva-rest-val') || '0') + '/10   EVA movimiento: ' + (textOf('eva-mov-val') || '0') + '/10   EVA irruptivo: ' + (textOf('eva-irr-val') || '0') + '/10');
+  lines.push('Localización: ' + (fieldValue('dolor_loc') || '—') + '   Irradiación: ' + (fieldValue('dolor_irrad') || '—'));
+  lines.push('Temporalidad: ' + (fieldValue('dolor_temp') || '—') + '   Tipo predominante: ' + (fieldValue('dolor_tipo') || '—'));
+  lines.push('Alivian: ' + (fieldValue('dolor_alivia') || '—') + '   Empeoran: ' + (fieldValue('dolor_empeora') || '—'));
+  if (fieldValue('dolor_desc')) lines.push('Descripción: ' + fieldValue('dolor_desc'));
+  return lines.join('\n');
+}
+
+function buildPlanText() {
+  var lines = [];
+  lines.push('-- ANÁLISIS Y DIAGNÓSTICOS --');
+  lines.push('Análisis: ' + (fieldValue('analisis_clinico') || '—'));
+  lines.push('Dx principal: ' + (fieldValue('dx1') || '—'));
+  ['dx2','dx3','dx4'].forEach(function(f, i) {
+    if (fieldValue(f)) lines.push('Dx relacionado ' + (i + 1) + ': ' + fieldValue(f));
+  });
+  if (fieldValue('dx_z515') === 'si') lines.push('Incluye Z51.5 (Cuidados paliativos)');
+  lines.push('');
+  lines.push('-- PLAN DE MANEJO --');
+  if (prescribedMeds && prescribedMeds.length) {
+    lines.push('Medicamentos prescritos:');
+    prescribedMeds.forEach(function(m, idx) {
+      lines.push('  ' + (idx + 1) + '. ' + m.name + '  ' + (m.dosis_prescrita || '') + '  ' + (m.via || '') + '  ' + (m.frecuencia || '') + (m.observaciones ? '  [' + m.observaciones + ']' : ''));
+    });
+  } else {
+    lines.push('Medicamentos prescritos: ninguno');
+  }
+  lines.push('');
+  lines.push('Plan no farmacológico: ' + (fieldValue('plan_no_farmaco') || '—'));
+  lines.push('Limitación esfuerzo terapéutico (LET): ' + (fieldValue('let_doc') || '—'));
+  lines.push('');
+  lines.push('-- SEGUIMIENTO --');
+  lines.push('Próximo control: ' + (fieldValue('prox_control') || '—') + '   Modalidad: ' + (fieldValue('modalidad_control') || '—'));
+  lines.push('Signos de alarma: ' + (fieldValue('signos_alarma') || '—'));
+  lines.push('Instrucciones: ' + (fieldValue('instrucciones') || '—'));
+  return lines.join('\n');
+}
+
+function buildResumenCompleto() {
+  return [
+    buildHistoriaText(),
+    '',
+    buildExamenText(),
+    '',
+    buildDolorText(),
+    '',
+    buildEscalasText(),
+    '',
+    buildPlanText()
+  ].join('\n');
+}
+
+function copyHistoria() { copyToClipboard(buildHistoriaText()); }
+function copyExamen()   { copyToClipboard(buildExamenText()); }
+function copyEscalas()  { copyToClipboard(buildEscalasText()); }
+function copyAll()      { copyToClipboard(buildResumenCompleto()); }
+
+// =============================================================
 // EXPORT PDF
 // =============================================================
 function exportPDF() {
@@ -1677,7 +1957,15 @@ function switchTab(tabId) {
 // =============================================================
 // INIT
 // =============================================================
+function adjustStickyOffsets() {
+  var h = document.querySelector('.app-header');
+  if (!h) return;
+  document.documentElement.style.setProperty('--header-h', h.offsetHeight + 'px');
+}
+
 function init() {
+  adjustStickyOffsets();
+  window.addEventListener('resize', adjustStickyOffsets);
   // Tabs
   document.querySelectorAll('.nav-tab').forEach(function(tab) {
     tab.addEventListener('click', function() { switchTab(tab.dataset.tab); });
