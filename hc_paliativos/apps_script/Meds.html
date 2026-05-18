@@ -1,0 +1,314 @@
+<script>
+// =============================================================
+// MEDS_DB — Base de datos farmacológica para Cuidados Paliativos
+// Datos INVIMA autoritativos proporcionados por el usuario.
+// Fichas con justificación clínica por tipo de dolor.
+// =============================================================
+var MEDS_DB = [
+  // ============ OPIOIDES DÉBILES ============
+  {id:"tramadol",name:"Tramadol",cat:"Opioide débil",grupo:"Escalón 2 OMS",
+   atc:"N02AX02",invima:"Múltiples registros INVIMA vigentes",
+   presentaciones:"Cápsulas 50mg, Gotas 100mg/mL, Ampolla 50mg/mL, Tab retard 100/150/200mg",
+   indicacion_invima:"Tratamiento del dolor de intensidad moderada a severa.",
+   dosis_usual:"50-100mg c/6-8h VO. Máx 400mg/día. Gotas: 20-40 gotas c/6-8h.",
+   justificacion_tipos:{
+     nociceptivo_somatico:"Tramadol está indicado como opioide de segundo escalón OMS para dolor nociceptivo somático moderado (EVA 4-6) que no responde adecuadamente a analgésicos no opioides. Su mecanismo dual (agonismo µ débil + inhibición de recaptación de serotonina y noradrenalina) proporciona analgesia complementaria. Registro INVIMA vigente para dolor moderado a severo.",
+     nociceptivo_visceral:"Tramadol indicado para dolor visceral moderado por su acción central como agonista opioide µ parcial. El componente monoaminérgico contribuye a la modulación del dolor visceral. Considerar asociación con antiespasmódicos si componente cólico.",
+     neuropatico:"Tramadol presenta ventaja en dolor neuropático sobre otros opioides débiles por su acción dual: el efecto inhibidor de la recaptación de serotonina y noradrenalina potencia la analgesia en dolor neuropático. Se recomienda asociar a coadyuvante anticonvulsivante o antidepresivo.",
+     mixto:"Tramadol como opioide de segundo escalón es especialmente útil en dolor mixto por su doble mecanismo de acción: componente opioide para dolor nociceptivo y componente monoaminérgico para el componente neuropático.",
+     irruptivo:"No es la primera línea para dolor irruptivo por su tiempo de inicio lento. Considerar formulación de liberación inmediata como rescate en pacientes con dolor basal controlado con segundo escalón.",
+     total:"Como parte del manejo multimodal del dolor total, tramadol contribuye al componente físico del dolor. Debe complementarse con intervenciones psicosociales y espirituales."
+   },precauciones:"Contraindicado con IMAO. Riesgo de síndrome serotoninérgico con ISRS/IRSN. Reducir dosis en insuficiencia renal (TFG <30mL/min). Puede reducir umbral convulsivo."},
+
+  {id:"codeina",name:"Codeína",cat:"Opioide débil",grupo:"Escalón 2 OMS",
+   atc:"N02AA59",invima:"Registros INVIMA vigentes (combinaciones con acetaminofén)",
+   presentaciones:"Tabletas Codeína 30mg + Acetaminofén 325mg",
+   indicacion_invima:"Alivio del dolor leve a moderadamente severo.",
+   dosis_usual:"30-60mg c/4-6h VO. Máx 240mg/día de codeína.",
+   justificacion_tipos:{
+     nociceptivo_somatico:"Codeína es un profármaco que se metaboliza a morfina vía CYP2D6. Indicado en dolor nociceptivo somático leve a moderado como segundo escalón OMS. La combinación con acetaminofén proporciona analgesia multimodal sinérgica.",
+     nociceptivo_visceral:"Indicado para dolor visceral leve a moderado. La asociación con acetaminofén mejora eficacia analgésica. Precaución en obstrucción intestinal por efecto anticolinérgico.",
+     neuropatico:"Eficacia limitada como monoterapia en dolor neuropático. Se recomienda como parte de estrategia multimodal asociado a coadyuvantes.",
+     mixto:"Útil en dolor mixto leve a moderado como parte de terapia combinada. La asociación con acetaminofén cubre el componente nociceptivo.",
+     irruptivo:"Puede utilizarse como rescate en dolor irruptivo leve cuando el dolor basal está controlado con primer escalón.",
+     total:"Componente farmacológico en manejo integral del dolor total leve a moderado."
+   },precauciones:"Metabolismo dependiente de CYP2D6 (metabolizadores lentos: ineficaz; ultrarrápidos: riesgo de toxicidad). Dosis máxima de acetaminofén 4g/día combinado."},
+
+  {id:"hidrocodona",name:"Hidrocodona + Acetaminofén",cat:"Opioide débil-moderado",grupo:"Escalón 2 OMS",
+   atc:"N02BE71",invima:"INVIMA 2021M-0020449 (Vigente). Exp. 20195416.",
+   presentaciones:"Tabletas Hidrocodona 5mg / Acetaminofén 325mg (Genfar). Caja x10, x30, x100, x150 tabletas.",
+   indicacion_invima:"ACTA NO. 07 DE 2018 SEM NUMERAL 3.1.4.1 TRATAMIENTO DEL DOLOR MODERADO A MODERADAMENTE SEVERO. Registro sanitario INVIMA 2021M-0020449, estado: Vigente. Fabricar y Vender. Franja: Ninguna. Venta con fórmula facultativa.",
+   dosis_usual:"5-10mg de hidrocodona c/4-6h VO. Máx 60mg/día de hidrocodona. No exceder 4g/día de acetaminofén.",
+   justificacion_tipos:{
+     nociceptivo_somatico:"Hidrocodona + Acetaminofén con Registro INVIMA 2021M-0020449 vigente, indicado para tratamiento del dolor moderado a moderadamente severo. La hidrocodona actúa como agonista opioide µ con potencia intermedia entre codeína y morfina. La combinación con acetaminofén 325mg proporciona analgesia multimodal. Clasificación ATC N02BE71. Apropiado para dolor óseo, muscular y articular moderado en paciente paliativo.",
+     nociceptivo_visceral:"Indicado según registro INVIMA vigente para dolor moderado a moderadamente severo. La hidrocodona proporciona analgesia visceral a través del agonismo µ central. La asociación con acetaminofén potencia la eficacia. Precaución: puede enmascarar diagnóstico de condiciones abdominales agudas según ficha técnica INVIMA.",
+     neuropatico:"Aunque la indicación INVIMA es dolor moderado a moderadamente severo sin especificación de tipo, la eficacia opioide en dolor neuropático es moderada como monoterapia. Se recomienda asociar a coadyuvante anticonvulsivante (gabapentina/pregabalina) o antidepresivo dual (duloxetina/amitriptilina).",
+     mixto:"Hidrocodona + Acetaminofén indicado INVIMA para dolor moderado a moderadamente severo. En dolor mixto, el componente opioide aborda el dolor nociceptivo y el acetaminofén aporta analgesia periférica. Complementar con coadyuvantes para el componente neuropático.",
+     irruptivo:"Puede utilizarse como analgesia de rescate para dolor irruptivo moderado. Inicio de acción 20-30 minutos VO. Documentar frecuencia de rescates para evaluar necesidad de rotación a tercer escalón.",
+     total:"Componente farmacológico del abordaje integral del dolor total moderado. Registro INVIMA vigente respalda su uso. Complementar obligatoriamente con medidas no farmacológicas e intervención psicosocial-espiritual."
+   },precauciones:"Según ficha INVIMA: contraindicado en hipersensibilidad previa a opioides (sensibilidad cruzada). Riesgo de falla hepática por acetaminofén (no exceder 4g/día). Depresión respiratoria dosis-dependiente. Precaución en ancianos, insuficiencia hepática/renal, hipotiroidismo, enfermedad de Addison. No usar con IMAO. Puede causar confusión y sobresedación en ancianos. Medicamento de control especial."},
+
+  // ============ OPIOIDES FUERTES ============
+  {id:"morfina",name:"Morfina",cat:"Opioide fuerte",grupo:"Escalón 3 OMS",
+   atc:"N02AA01",invima:"Múltiples registros INVIMA vigentes (oral, SC, IV). Medicamento esencial.",
+   presentaciones:"Tab 15/30mg, Solución oral 3mg/mL, Ampolla 10mg/mL. Liberación prolongada: Tab 15/30/60/100mg.",
+   indicacion_invima:"Dolor severo (oncológico y no oncológico). Disnea refractaria en enfermedad avanzada.",
+   dosis_usual:"Inicio: 5-10mg VO c/4h o 2.5-5mg SC c/4h. Titular según respuesta. No tiene techo analgésico.",
+   justificacion_tipos:{
+     nociceptivo_somatico:"Morfina es el opioide de referencia del tercer escalón OMS, gold standard en dolor severo. Agonista µ puro sin techo analgésico. Indicación INVIMA para dolor severo. En dolor óseo metastásico severo, considerar asociación con AINE y bifosfonatos. Titular dosis según respuesta analgésica y efectos adversos.",
+     nociceptivo_visceral:"Morfina como agonista µ puro es primera línea para dolor visceral severo (compresión tumoral, hepatomegalia, obstrucción). En dolor cólico visceral, considerar asociar butilbromuro de hioscina. Titular hasta control adecuado del dolor.",
+     neuropatico:"Morfina tiene eficacia moderada en dolor neuropático puro. Se recomienda como tercer escalón en combinación obligada con coadyuvantes: gabapentina/pregabalina (primera línea) y/o amitriptilina/duloxetina. La dosis requerida puede ser mayor que en dolor nociceptivo.",
+     mixto:"En dolor mixto severo, morfina como pilar del tercer escalón asociada a coadyuvantes para el componente neuropático. Ajustar dosis según el componente predominante. Registro INVIMA respalda uso en dolor severo.",
+     irruptivo:"Morfina de liberación inmediata (oral o SC) es primera línea para rescate de dolor irruptivo oncológico. Dosis de rescate: 10-15% de la dosis diaria total. Vía SC: inicio en 15-20 min. Si >3 rescates/día, ajustar dosis basal.",
+     total:"Morfina como eje farmacológico del manejo del dolor total severo. El alivio del sufrimiento físico es condición necesaria para abordar las dimensiones psicológica, social y espiritual del dolor total (Cicely Saunders). Marco legal: Ley 1733/2014 garantiza acceso a opioides en cuidados paliativos."
+   },precauciones:"Titular desde dosis bajas. Prescribir laxante profiláctico (estreñimiento). Antiemético primeros 5-7 días. Precaución en insuficiencia renal (acumulación de M6G). Reducir dosis en ancianos. Vigilar sedación y depresión respiratoria."},
+
+  {id:"hidromorfona",name:"Hidromorfona",cat:"Opioide fuerte",grupo:"Escalón 3 OMS",
+   atc:"N02AA03",invima:"Registros INVIMA vigentes. Medicamento de control especial.",
+   presentaciones:"Cápsulas lib. prolongada (OROS) 4/8/16/32mg. Ampolla 2mg/mL.",
+   indicacion_invima:"Dolor severo que requiere analgesia opioide continua durante un periodo prolongado.",
+   dosis_usual:"Inicio: 4mg VO c/24h (OROS). Rotación desde morfina: ratio 5:1 (morfina:hidromorfona).",
+   justificacion_tipos:{
+     nociceptivo_somatico:"Hidromorfona es un opioide semisintético 5-7 veces más potente que la morfina. Indicada en dolor severo que requiere analgesia opioide continua. Formulación OROS permite administración c/24h con liberación controlada. Ventaja en dolor óseo severo por alta potencia y perfil farmacocinético estable.",
+     nociceptivo_visceral:"Indicada para dolor visceral severo. Ventaja sobre morfina en insuficiencia renal por menor acumulación de metabolitos activos. Formulación de liberación prolongada proporciona analgesia sostenida.",
+     neuropatico:"Como otros opioides fuertes, eficacia parcial en dolor neuropático. Asociar obligatoriamente con coadyuvantes. Puede ser alternativa en rotación opioide cuando morfina es insuficiente.",
+     mixto:"Hidromorfona como alternativa al tercer escalón en dolor mixto severo, especialmente útil en rotación opioide por tolerancia a morfina o efectos adversos. Asociar con coadyuvantes para componente neuropático.",
+     irruptivo:"La formulación OROS no es apropiada para rescate. Para dolor irruptivo en pacientes con hidromorfona basal, usar morfina de liberación inmediata como rescate.",
+     total:"Componente opioide del manejo integral del dolor total severo. Especialmente útil cuando la morfina genera efectos adversos intolerables."
+   },precauciones:"No triturar cápsulas OROS. Rotación con reducción 25-50% de dosis equianalgésica. Precaución en hepatopatía. Menor riesgo de prurito e histaminoliberación que morfina."},
+
+  {id:"oxicodona",name:"Oxicodona",cat:"Opioide fuerte",grupo:"Escalón 3 OMS",
+   atc:"N02AA05",invima:"Registros INVIMA vigentes. Tab liberación controlada.",
+   presentaciones:"Tab lib. controlada 10/20/40/80mg. Cápsulas lib. inmediata 5/10/20mg.",
+   indicacion_invima:"Dolor severo que solo puede ser tratado adecuadamente con analgésicos opioides.",
+   dosis_usual:"Inicio: 10mg c/12h VO (lib. controlada). Ratio equianalgésica con morfina VO: 1.5:1.",
+   justificacion_tipos:{
+     nociceptivo_somatico:"Oxicodona con registro INVIMA para dolor severo. Agonista µ y κ, con posible ventaja en dolor somático profundo y óseo por su acción sobre receptores κ. Formulación c/12h facilita adherencia.",
+     nociceptivo_visceral:"Oxicodona presenta ventaja teórica en dolor visceral por su acción agonista κ además de µ. Estudios sugieren mejor respuesta en dolor visceral comparada con otros opioides del tercer escalón.",
+     neuropatico:"Oxicodona ha mostrado evidencia en dolor neuropático, posiblemente por su acción sobre receptores κ. Considerar como opción en rotación opioide cuando el componente neuropático es predominante, siempre asociada a coadyuvantes.",
+     mixto:"Excelente opción para dolor mixto severo por su perfil receptor dual (µ y κ). La acción κ puede beneficiar especialmente el componente visceral y neuropático del dolor mixto.",
+     irruptivo:"Formulación de liberación inmediata (cápsulas 5-10mg) útil para rescate. Dosis rescate: 10-15% de dosis diaria total.",
+     total:"Componente farmacológico del dolor total severo. Formulación de lib. controlada facilita adherencia y mejora calidad de vida."
+   },precauciones:"No triturar tabletas de lib. controlada (riesgo de sobredosis fatal). Metabolismo CYP3A4 y CYP2D6. Precaución con inhibidores de CYP3A4."},
+
+  {id:"fentanilo_td",name:"Fentanilo transdérmico",cat:"Opioide fuerte",grupo:"Escalón 3 OMS",
+   atc:"N02AB03",invima:"Registros INVIMA vigentes. Parches 12/25/50/75/100 µg/h. Control especial.",
+   presentaciones:"Parches transdérmicos 12, 25, 50, 75, 100 µg/h. Cambio c/72h.",
+   indicacion_invima:"Dolor crónico severo que requiere analgesia opioide continua. Dolor oncológico.",
+   dosis_usual:"Inicio: 12-25 µg/h c/72h (pacientes no expuestos a opioides iniciar con 12 µg/h). Rotación desde morfina oral: dividir dosis diaria total entre 2.",
+   justificacion_tipos:{
+     nociceptivo_somatico:"Fentanilo transdérmico con registro INVIMA para dolor crónico severo. Agonista µ puro, 80-100 veces más potente que morfina. Vía transdérmica ideal para pacientes con dificultad para deglución, náuseas refractarias, obstrucción intestinal, o mala absorción oral. Liberación sostenida c/72h.",
+     nociceptivo_visceral:"Indicado en dolor visceral severo crónico, especialmente ventajoso en obstrucción intestinal maligna (no requiere vía oral). Menor estreñimiento que morfina por vía transdérmica. Analgesia estable y sostenida.",
+     neuropatico:"Eficacia comparable a otros opioides en dolor neuropático. La vía transdérmica ofrece niveles plasmáticos estables que benefician el control del dolor neuropático continuo. Asociar con coadyuvantes.",
+     mixto:"Fentanilo TD como opción en dolor mixto severo crónico, especialmente en pacientes con intolerancia a la vía oral, obstrucción intestinal, o preferencia por menor frecuencia de administración.",
+     irruptivo:"Los parches transdérmicos NO son adecuados para dolor irruptivo. Para rescate: fentanilo sublingual/transmucoso o morfina de liberación inmediata. Dosis de rescate fentanilo: calcular según dosis basal.",
+     total:"Fentanilo TD mejora calidad de vida al reducir frecuencia de administración (c/72h), menor estreñimiento que morfina oral. Facilita manejo ambulatorio y domiciliario del dolor severo."
+   },precauciones:"No cortar parches. No exponer a calor externo (fiebre, mantas térmicas). Inicio de acción lento (12-24h): requiere analgesia puente. No usar en dolor agudo. Retirar gradualmente. Pacientes caquécticos: absorción errática."},
+
+  {id:"fentanilo_sl",name:"Fentanilo sublingual/transmucoso",cat:"Opioide fuerte",grupo:"Escalón 3 OMS - Rescate",
+   atc:"N02AB03",invima:"Registros INVIMA para formulaciones transmucosas.",
+   presentaciones:"Comprimidos sublinguales 100/200/400/600/800 µg.",
+   indicacion_invima:"Dolor irruptivo oncológico en pacientes adultos que ya reciben terapia de mantenimiento con opioides.",
+   dosis_usual:"Iniciar con 100 µg. Titular según respuesta. Máx 4 episodios/día con mínimo 2h entre dosis.",
+   justificacion_tipos:{
+     nociceptivo_somatico:"Fentanilo sublingual/transmucoso con indicación INVIMA específica para dolor irruptivo oncológico. Inicio de acción rápido (5-10 min por vía sublingual) lo hace ideal para crisis de dolor irruptivo. Solo en pacientes ya en tercer escalón con opioides basales.",
+     nociceptivo_visceral:"Indicado para episodios irruptivos de dolor visceral en pacientes con analgesia basal opioide. La rápida absorción transmucosa permite manejo eficaz de crisis viscerales agudas.",
+     neuropatico:"Útil para exacerbaciones agudas de dolor neuropático irruptivo, especialmente dolor lancinante paroxístico. Asociar al manejo basal con coadyuvantes.",
+     mixto:"Fentanilo de acción rápida como rescate en dolor irruptivo mixto. Cada episodio debe documentarse para ajuste de dosis basal.",
+     irruptivo:"INDICACIÓN PRINCIPAL. Fentanilo sublingual es primera línea para dolor irruptivo oncológico por su rápido inicio de acción. Registro INVIMA específico para esta indicación. Titular desde dosis mínima. No hay correlación entre dosis basal y dosis de rescate efectiva: titular individualmente.",
+     total:"Componente esencial para manejo del dolor irruptivo dentro del abordaje integral del dolor total."
+   },precauciones:"Solo en pacientes tolerantes a opioides (≥60mg/día morfina oral equivalente o equivalente). No usar en pacientes naive. Titular individualmente. Riesgo de depresión respiratoria fatal en no tolerantes."},
+
+  {id:"metadona",name:"Metadona",cat:"Opioide fuerte",grupo:"Escalón 3 OMS",
+   atc:"N02AC52",invima:"Registros INVIMA vigentes. Control especial.",
+   presentaciones:"Tabletas 5/10/40mg. Solución oral.",
+   indicacion_invima:"Dolor severo. Tratamiento de desintoxicación y mantenimiento de dependencia a opiáceos.",
+   dosis_usual:"Inicio dolor: 2.5-5mg c/8-12h. Rotación compleja: requiere tablas de conversión variables según dosis previa.",
+   justificacion_tipos:{
+     nociceptivo_somatico:"Metadona con registro INVIMA para dolor severo. Agonista µ con propiedades únicas: antagonismo NMDA (previene tolerancia) e inhibición de recaptación de serotonina y noradrenalina. Vida media larga pero variable. Especialmente útil en dolor refractario a otros opioides.",
+     nociceptivo_visceral:"Metadona efectiva en dolor visceral severo refractario. La acción antagonista NMDA puede ser particularmente beneficiosa en estados de sensibilización central asociados a dolor visceral crónico.",
+     neuropatico:"Metadona presenta ventaja específica en dolor neuropático por su doble mecanismo: agonismo µ + antagonismo NMDA. El bloqueo NMDA contrarresta mecanismos de sensibilización central y wind-up implicados en dolor neuropático. Considerar como opción preferente en rotación opioide cuando predomina componente neuropático.",
+     mixto:"Metadona es opción particularmente útil en dolor mixto severo por su perfil farmacológico triple: agonismo µ (componente nociceptivo), antagonismo NMDA (sensibilización central y neuropático), inhibición recaptación monoaminas (modulación descendente del dolor).",
+     irruptivo:"No adecuada para rescate por vida media larga y variable. Para rescates usar morfina de liberación inmediata o fentanilo transmucoso.",
+     total:"La metadona, por su perfil farmacológico único, es especialmente valiosa en dolor total complejo refractario a otros opioides."
+   },precauciones:"PRESCRIPCIÓN POR ESPECIALISTA. Vida media larga e impredecible (15-60h): riesgo de acumulación. Rotación compleja con tablas variables. Prolonga QTc: ECG basal y monitoreo. Múltiples interacciones por CYP3A4, 2D6, 2B6."},
+
+  {id:"buprenorfina",name:"Buprenorfina transdérmica",cat:"Opioide fuerte",grupo:"Escalón 3 OMS",
+   atc:"N02AE01",invima:"INVIMA 2025M-0021898. Exp. 20154557. Parche 35 µg/h (20mg buprenorfina). Estado: Pérdida Fuerza Ejec. Fabricante: Hexal AG (Alemania). Importador: Novartis/Sandoz.",
+   presentaciones:"Parche transdérmico 35 µg/h. Caja x 5 sachets. Sistema transdérmico DD. Cambio c/96h (cada 4 días) o c/72h según presentación.",
+   indicacion_invima:"DOLOR ONCOLÓGICO MODERADO A SEVERO Y DOLOR SEVERO QUE NO RESPONDA A LOS ANALGESICOS NO OPIOIDES. BUPRENORFINA NO ES ADECUADO PARA EL TRATAMIENTO DEL DOLOR AGUDO. Registro INVIMA 2025M-0021898. Franja Verde-Violeta. Clasificación ATC N02AE01 - Opioides, Derivados de la Oripavina. Medicamento esencial y de control especial.",
+   dosis_usual:"Parche 35 µg/h c/72-96h. En rotación desde morfina: considerar techo terapéutico por agonismo parcial µ.",
+   justificacion_tipos:{
+     nociceptivo_somatico:"Buprenorfina transdérmica con registro INVIMA 2025M-0021898 (Exp. 20154557) para dolor oncológico moderado a severo y dolor severo que no responda a analgésicos no opioides. Agonista parcial µ y antagonista κ con potencia 25-50 veces mayor que morfina. Ventaja: menor depresión respiratoria por efecto techo. Parche transdérmico permite analgesia sostenida sin vía oral.",
+     nociceptivo_visceral:"Indicación INVIMA para dolor severo que no responde a analgésicos no opioides. Buprenorfina TD útil en dolor visceral moderado a severo crónico. Menor estreñimiento que agonistas puros. Precaución: el efecto techo puede limitar eficacia en dolor visceral muy severo.",
+     neuropatico:"Buprenorfina tiene acción antihiperalgésica por su perfil receptor (agonista parcial µ, antagonista κ, agonista ORL-1). Puede ser ventajosa en dolor neuropático al modular múltiples vías del dolor. Asociar a coadyuvantes.",
+     mixto:"Buprenorfina TD como alternativa en dolor mixto moderado a severo por su perfil receptor amplio. La acción sobre receptores ORL-1 y κ complementa la analgesia µ. Indicación INVIMA respalda su uso en dolor oncológico y dolor severo refractario a no opioides.",
+     irruptivo:"Parche transdérmico NO es para dolor irruptivo. Para rescates en pacientes con buprenorfina basal, considerar buprenorfina sublingual o, en dolor severo, valorar compatibilidad con agonistas puros.",
+     total:"Buprenorfina TD como opción en dolor total moderado a severo. Ventajas: menor depresión respiratoria, menor estreñimiento, vía transdérmica (no requiere deglución). Según ficha INVIMA: no adecuado para dolor agudo."
+   },precauciones:"Según ficha INVIMA: Contraindicado en dependencia a opioides, tratamiento de abstinencia, deterioro grave de función respiratoria, uso de IMAO (o dentro de 2 semanas), miastenia gravis, delirium tremens, embarazo. Precaución con fiebre/calor externo (aumenta absorción). Agonista parcial: puede precipitar abstinencia al cambiar desde agonistas puros. No en menores de 18 años. Metabolismo hepático: precaución en hepatopatía."},
+
+  {id:"tapentadol",name:"Tapentadol",cat:"Opioide fuerte",grupo:"Escalón 3 OMS",
+   atc:"N02AX06",invima:"Registros INVIMA vigentes. Control especial.",
+   presentaciones:"Tab lib. prolongada 50/100/150/200/250mg.",
+   indicacion_invima:"Dolor severo crónico en adultos que solo puede ser manejado adecuadamente con analgésico opioide.",
+   dosis_usual:"Inicio: 50mg c/12h. Titular según respuesta. Máx 500mg/día.",
+   justificacion_tipos:{
+     nociceptivo_somatico:"Tapentadol con registro INVIMA para dolor severo crónico. Agonista µ + inhibidor de recaptación de noradrenalina (MOR-NRI). En dolor nociceptivo somático severo crónico, el componente µ proporciona analgesia central efectiva con menor incidencia de efectos adversos gastrointestinales que morfina.",
+     nociceptivo_visceral:"Indicado para dolor visceral severo crónico. El mecanismo dual MOR-NRI ofrece analgesia a través de dos vías complementarias. Menor estreñimiento que opioides puros.",
+     neuropatico:"Tapentadol presenta VENTAJA ESPECÍFICA en dolor neuropático por su potente inhibición de la recaptación de noradrenalina, que activa la vía inhibitoria descendente noradrenérgica del dolor. Estudios clínicos han demostrado eficacia en neuropatía diabética y dolor neuropático oncológico. Puede considerarse como primera opción de tercer escalón cuando predomina componente neuropático.",
+     mixto:"OPCIÓN PREFERENTE en dolor mixto severo crónico. El doble mecanismo MOR-NRI aborda simultáneamente el componente nociceptivo (agonismo µ) y neuropático (inhibición recaptación NA) con una sola molécula. Menor necesidad de coadyuvantes aunque se pueden asociar.",
+     irruptivo:"Formulación de liberación prolongada no es adecuada para rescate. Para dolor irruptivo en pacientes con tapentadol basal, usar opioides de liberación inmediata.",
+     total:"Tapentadol como opción farmacológica en dolor total severo crónico. Mejor tolerabilidad gastrointestinal (menor náusea, estreñimiento) mejora calidad de vida."
+   },precauciones:"No triturar tab. lib. prolongada. Evitar con IMAO. Menor interacción con CYP450 que tramadol. Riesgo de síndrome serotoninérgico si se asocia a serotoninérgicos. Precaución en insuficiencia hepática severa."},
+
+  // ============ COADYUVANTES — DOLOR NEUROPÁTICO ============
+  {id:"gabapentina",name:"Gabapentina",cat:"Coadyuvante anticonvulsivante",grupo:"Dolor neuropático - 1ª línea",
+   atc:"N03AX12",invima:"Múltiples registros INVIMA vigentes.",
+   presentaciones:"Cápsulas 300/400mg. Tabletas 600/800mg.",
+   indicacion_invima:"Dolor neuropático periférico. Epilepsia.",
+   dosis_usual:"Inicio: 300mg/noche. Titular: 300mg c/3 días. Dosis terapéutica: 900-3600mg/día en 3 tomas.",
+   justificacion_tipos:{
+     nociceptivo_somatico:"No es primera línea para dolor nociceptivo somático puro. Puede contribuir como coadyuvante si existe componente de sensibilización central.",
+     neuropatico:"Gabapentina es PRIMERA LÍNEA para dolor neuropático en cuidados paliativos. Bloquea subunidad α2δ de canales de calcio voltaje-dependientes, reduciendo la liberación de neurotransmisores excitatorios. Registro INVIMA para dolor neuropático periférico. Evidencia sólida en neuralgia postherpética, neuropatía diabética y dolor neuropático oncológico. Titular gradualmente desde 300mg/noche.",
+     mixto:"Coadyuvante esencial en dolor mixto para abordar el componente neuropático. Asociar a opioide del escalón correspondiente. Titular gradualmente para minimizar somnolencia.",
+     total:"Componente coadyuvante del manejo multimodal del dolor total con componente neuropático."
+   },precauciones:"Titular lentamente (reduce somnolencia/mareo). Ajustar en insuficiencia renal. No suspender abruptamente. Somnolencia puede ser ventajosa si insomnio asociado."},
+
+  {id:"pregabalina",name:"Pregabalina",cat:"Coadyuvante anticonvulsivante",grupo:"Dolor neuropático - 1ª línea",
+   atc:"N03AX16",invima:"Registros INVIMA vigentes.",
+   presentaciones:"Cápsulas 25/50/75/150/300mg.",
+   indicacion_invima:"Dolor neuropático periférico y central. Trastorno de ansiedad generalizada. Epilepsia.",
+   dosis_usual:"Inicio: 25-75mg/noche. Titular a 150-600mg/día en 2 tomas.",
+   justificacion_tipos:{
+     nociceptivo_somatico:"No primera línea para dolor nociceptivo somático. Puede coadyuvar en dolor con componente de sensibilización.",
+     neuropatico:"Pregabalina es PRIMERA LÍNEA para dolor neuropático con registro INVIMA específico. Más potente y predecible que gabapentina. Farmacocinética lineal (absorción más predecible). Beneficio adicional ansiolítico relevante en pacientes paliativos con ansiedad comórbida. Inicio más rápido que gabapentina.",
+     mixto:"Coadyuvante de primera línea en dolor mixto para el componente neuropático. Ventaja sobre gabapentina: farmacocinética lineal, menor número de tomas (BID vs TID), efecto ansiolítico adicional.",
+     total:"En dolor total con componente neuropático y ansiedad, pregabalina ofrece doble beneficio: analgesia neuropática + efecto ansiolítico."
+   },precauciones:"Titular gradualmente. Ajustar en insuficiencia renal. Somnolencia, edema periférico, aumento de peso. No suspender abruptamente. Menor titulación requerida que gabapentina."},
+
+  {id:"amitriptilina",name:"Amitriptilina",cat:"Coadyuvante antidepresivo tricíclico",grupo:"Dolor neuropático - 1ª línea",
+   atc:"N06AA09",invima:"Registros INVIMA vigentes.",
+   presentaciones:"Tabletas 25mg.",
+   indicacion_invima:"Depresión. Dolor neuropático. Profilaxis de migraña.",
+   dosis_usual:"Inicio: 10-25mg/noche. Titular cada semana. Dosis analgésica: 25-75mg/noche.",
+   justificacion_tipos:{
+     nociceptivo_somatico:"Evidencia en dolor somático crónico por modulación descendente. Útil como coadyuvante en dolor musculoesquelético crónico.",
+     neuropatico:"Amitriptilina es PRIMERA LÍNEA para dolor neuropático (NNT 3.6). Mecanismo: inhibición dual de recaptación de serotonina y noradrenalina + bloqueo canales de sodio. Registro INVIMA para dolor neuropático. Beneficio adicional en insomnio y depresión comórbidos. Dosis analgésica menor que antidepresiva.",
+     mixto:"Coadyuvante valioso en dolor mixto con componente neuropático, especialmente si coexiste insomnio y/o depresión. Administrar en dosis nocturna única.",
+     total:"Amitriptilina aborda múltiples dimensiones del dolor total: analgesia neuropática, mejora del sueño, efecto antidepresivo. Especialmente valiosa en cuidados paliativos por su perfil multidimensional."
+   },precauciones:"Efectos anticolinérgicos (boca seca, estreñimiento, retención urinaria). Contraindicada en glaucoma de ángulo estrecho, retención urinaria, cardiopatía (prolonga QTc). Precaución en ancianos. Somnolencia: administrar en la noche."},
+
+  {id:"duloxetina",name:"Duloxetina",cat:"Coadyuvante IRSN",grupo:"Dolor neuropático - 1ª línea",
+   atc:"N06AX21",invima:"Registros INVIMA vigentes.",
+   presentaciones:"Cápsulas 30/60mg.",
+   indicacion_invima:"Depresión mayor. Dolor neuropático diabético periférico. Trastorno de ansiedad generalizada.",
+   dosis_usual:"Inicio: 30mg/día. Aumentar a 60mg/día después de 1-2 semanas.",
+   justificacion_tipos:{
+     nociceptivo_somatico:"Duloxetina tiene evidencia en dolor musculoesquelético crónico (osteoartrosis, lumbalgia crónica) por modulación de vía inhibitoria descendente.",
+     neuropatico:"Duloxetina con registro INVIMA para dolor neuropático diabético periférico. IRSN con evidencia sólida en dolor neuropático (NNT 6.4). Alternativa a amitriptilina con mejor perfil de efectos adversos en ancianos. Menos efectos anticolinérgicos.",
+     mixto:"Útil en dolor mixto con componente neuropático, especialmente en pacientes donde amitriptilina está contraindicada (ancianos, cardiopatía, retención urinaria).",
+     total:"Duloxetina aborda dolor neuropático + depresión + ansiedad. Perfil más seguro que amitriptilina en pacientes frágiles."
+   },precauciones:"Náusea inicial frecuente (titular gradualmente). No suspender abruptamente. Precaución en hepatopatía. Interacción con CYP1A2 y CYP2D6. No combinar con IMAO."},
+
+  // ============ COADYUVANTES — OTROS ============
+  {id:"dexametasona",name:"Dexametasona",cat:"Corticoesteroide",grupo:"Coadyuvante antiinflamatorio",
+   atc:"H02AB02",invima:"Múltiples registros INVIMA vigentes.",
+   presentaciones:"Tab 0.5/0.75/4mg. Ampolla 4mg/mL, 8mg/2mL.",
+   indicacion_invima:"Procesos inflamatorios. Edema cerebral. Antiemético.",
+   dosis_usual:"4-16mg/día VO o IV/SC según indicación. Edema cerebral: 16mg/día. Antiemético: 4-8mg.",
+   justificacion_tipos:{
+     nociceptivo_somatico:"Dexametasona indicada como coadyuvante en dolor óseo metastásico (reduce edema peritumoral e inflamación). Dosis: 4-8mg/día. También útil en compresión medular (dosis altas: 16mg/día). Registro INVIMA para procesos inflamatorios.",
+     nociceptivo_visceral:"Indicada en dolor visceral por distensión capsular hepática (hepatomegalia tumoral), obstrucción intestinal maligna (reduce edema de pared), y compresión tumoral visceral. Dosis según severidad.",
+     neuropatico:"Coadyuvante en dolor neuropático por compresión nerviosa tumoral (reduce edema perineural). Especialmente indicada en compresión medular y plexopatías tumorales. Acción rápida mientras se titulan otros coadyuvantes.",
+     mixto:"Dexametasona como coadyuvante en dolor mixto oncológico: reduce componente inflamatorio y edema perineural/peritumoral. Beneficios adicionales: mejora apetito, reduce náusea, efecto euforizante leve.",
+     irruptivo:"Puede reducir frecuencia de dolor irruptivo al disminuir edema tumoral y componente inflamatorio.",
+     total:"Dexametasona como coadyuvante multidimensional en cuidados paliativos: analgesia, antiemético, orexígeno, mejora estado general, reduce edema cerebral. Impacto positivo en múltiples dimensiones del dolor total."
+   },precauciones:"Hiperglicemia, inmunosupresión, osteoporosis, miopatía proximal, insomnio (administrar en la mañana), psicosis. Reducir dosis gradualmente si uso >7 días. Protección gástrica si asocia AINE."},
+
+  {id:"haloperidol",name:"Haloperidol",cat:"Antipsicótico",grupo:"Antiemético / Antidelirium",
+   atc:"N05AD01",invima:"Registros INVIMA vigentes.",
+   presentaciones:"Gotas 2mg/mL. Tabletas 5mg. Ampolla 5mg/mL.",
+   indicacion_invima:"Psicosis aguda y crónica. Náuseas y vómitos. Agitación psicomotora.",
+   dosis_usual:"Delirium: 0.5-2mg SC/VO c/8-12h. Antiemético: 0.5-1.5mg/noche VO/SC. Agitación: 2.5-5mg SC/IM.",
+   justificacion_tipos:{
+     nociceptivo_somatico:"No es analgésico directo. Indicado como antiemético si náusea por opioides (antagonismo D2 en zona quimiorreceptora del gatillo). Indicado en delirium que puede coexistir con dolor no controlado.",
+     neuropatico:"Sin indicación analgésica directa. Manejo del delirium asociado.",
+     mixto:"Indicado para el manejo de náusea opioide y delirium en paciente con dolor mixto bajo tratamiento opioide.",
+     total:"Haloperidol en dolor total: manejo del delirium (frecuente en enfermedad avanzada), antiemético opioide de primera línea, y agitación terminal. Registro INVIMA para náuseas/vómitos y psicosis."
+   },precauciones:"Prolonga QTc. Síntomas extrapiramidales. Dosis menores en ancianos. Vía SC bien tolerada. Sedación mínima a dosis bajas. Contraindicado en Parkinson."},
+
+  {id:"midazolam",name:"Midazolam",cat:"Benzodiazepina",grupo:"Sedación paliativa / Anticonvulsivante",
+   atc:"N05CD08",invima:"Registros INVIMA vigentes. Control especial.",
+   presentaciones:"Ampolla 5mg/mL, 15mg/3mL, 50mg/10mL.",
+   indicacion_invima:"Sedación. Inducción anestésica. Estado epiléptico.",
+   dosis_usual:"Sedación paliativa: inicio 1-2.5mg SC en bolo, luego 10-30mg/24h en infusión SC continua. Convulsiones: 5mg SC/IM.",
+   justificacion_tipos:{
+     nociceptivo_somatico:"No es analgésico. Indicado para sedación paliativa cuando el dolor es refractario a todas las intervenciones analgésicas disponibles (sedación paliativa proporcional según Ley 1733/2014).",
+     neuropatico:"Sin indicación analgésica directa. Ansiolisis en paciente con dolor neuropático y ansiedad severa.",
+     total:"Midazolam en cuidados paliativos: sedación paliativa como recurso terapéutico final ante sufrimiento refractario (dolor, disnea, agitación, angustia existencial). Marco legal: Ley 1733/2014, Resolución 2665/2018. También: crisis convulsivas, mioclonías por opioides, ansiedad severa. Vía SC permite manejo domiciliario. Documentar indicación, proporcionalidad y consentimiento."
+   },precauciones:"Sedación paliativa requiere: documentación de refractariedad, consentimiento informado, indicación por equipo paliativo, proporcionalidad. Depresión respiratoria: tener flumazenilo disponible. Paradoja: puede causar agitación paradójica (especialmente ancianos)."},
+
+  {id:"hioscina",name:"Butilbromuro de Hioscina",cat:"Anticolinérgico",grupo:"Antiespasmódico / Estertores",
+   atc:"A03BB01",invima:"Registros INVIMA vigentes.",
+   presentaciones:"Ampolla 20mg/mL. Tabletas 10mg.",
+   indicacion_invima:"Espasmos del tracto gastrointestinal y genitourinario.",
+   dosis_usual:"20mg SC/IV c/6-8h. Estertores: 20mg SC c/4-6h PRN. Obstrucción intestinal: 60-120mg/24h ISCC.",
+   justificacion_tipos:{
+     nociceptivo_visceral:"Butilbromuro de hioscina con registro INVIMA para espasmos GI y genitourinarios. Anticolinérgico cuaternario que no cruza barrera hematoencefálica (menor sedación). Primera línea en dolor tipo cólico por obstrucción intestinal maligna. Reduce secreciones GI.",
+     total:"En cuidados paliativos: manejo de estertores premortem (reduce secreciones bronquiales), dolor cólico por obstrucción intestinal maligna, espasmo vesical. No cruza BHE: no causa sedación ni delirium."
+   },precauciones:"Contraindicado en glaucoma de ángulo estrecho. Retención urinaria. Taquicardia. No usar con anticolinérgicos centrales. Vía SC bien tolerada."},
+
+  {id:"metoclopramida",name:"Metoclopramida",cat:"Procinético / Antiemético",grupo:"Antiemético",
+   atc:"A03FA01",invima:"Registros INVIMA vigentes.",
+   presentaciones:"Tab 10mg. Ampolla 10mg/2mL. Gotas.",
+   indicacion_invima:"Náuseas y vómitos. Gastroparesia. Facilitación del vaciamiento gástrico.",
+   dosis_usual:"10mg c/8h VO/SC/IV. Máx 30mg/día. Máx 5 días consecutivos por riesgo de discinesia.",
+   justificacion_tipos:{
+     nociceptivo_visceral:"Metoclopramida indicada en náusea/vómito asociado a dolor visceral y gastroparesia. Procinético: mejora vaciamiento gástrico (frecuentemente retardado en pacientes con opioides). Contraindicada en obstrucción intestinal completa.",
+     total:"Antiemético de primera línea en cuidados paliativos para náusea por opioides, gastroparesia, y estasis gástrica. Registro INVIMA vigente. Complementa el manejo del bienestar del paciente."
+   },precauciones:"Contraindicada en obstrucción intestinal completa, feocromocitoma, Parkinson. Riesgo de discinesia tardía (limitar duración). Síntomas extrapiramidales. No asociar con haloperidol (potencia síntomas extrapiramidales)."},
+
+  {id:"ondansetron",name:"Ondansetrón",cat:"Antiemético 5-HT3",grupo:"Antiemético",
+   atc:"A04AA01",invima:"Registros INVIMA vigentes.",
+   presentaciones:"Tab 4/8mg. Ampolla 4mg/2mL, 8mg/4mL. Tab sublingual.",
+   indicacion_invima:"Prevención y tratamiento de náuseas y vómitos.",
+   dosis_usual:"4-8mg c/8-12h VO/IV/SC.",
+   justificacion_tipos:{
+     nociceptivo_somatico:"No es analgésico. Antiemético para náusea refractaria a metoclopramida y haloperidol, especialmente si asociada a quimioterapia o radioterapia.",
+     total:"Ondansetrón como antiemético de segunda/tercera línea en cuidados paliativos cuando metoclopramida y haloperidol son insuficientes o contraindicados. Especialmente útil en náusea por QT/RT. Registro INVIMA para náuseas y vómitos."
+   },precauciones:"Prolonga QTc (precaución con otros QTc prolongadores). Estreñimiento (frecuente). No tiene efecto procinético. Puede usarse vía SC."},
+
+  {id:"ketamina",name:"Ketamina",cat:"Antagonista NMDA",grupo:"Dolor refractario",
+   atc:"N01AX03",invima:"Registros INVIMA vigentes. Control especial.",
+   presentaciones:"Ampolla 500mg/10mL (50mg/mL).",
+   indicacion_invima:"Anestesia general. Sedación procedural.",
+   dosis_usual:"Dolor: 0.1-0.5mg/kg/h ISCC o 10-25mg SC c/4-6h. Burst: 100-300mg/24h ISCC x 3-5 días.",
+   justificacion_tipos:{
+     nociceptivo_somatico:"Ketamina como uso fuera de indicación (off-label) en dolor somático refractario a opioides. Antagonismo NMDA revierte tolerancia opioide y sensibilización central. Uso en cuidados paliativos respaldado por guías SECPAL e IAHPC.",
+     neuropatico:"Ketamina tiene indicación específica en dolor neuropático refractario por su antagonismo NMDA. Bloquea wind-up y sensibilización central implicados en dolor neuropático crónico. Evidencia en dolor por miembro fantasma, plexopatía tumoral refractaria. Uso off-label respaldado por guías internacionales de cuidados paliativos.",
+     mixto:"Ketamina como último recurso en dolor mixto refractario. El antagonismo NMDA aborda la sensibilización central presente en dolor crónico complejo. Puede permitir reducción de dosis de opioides (efecto ahorrador).",
+     total:"Ketamina en dolor total refractario: cuando todas las intervenciones analgésicas convencionales han fracasado. Uso off-label respaldado por guías internacionales. Documentar refractariedad, consentimiento, y proporcionalidad."
+   },precauciones:"Uso off-label en dolor (indicación INVIMA: anestesia). Efectos psicomiméticos (alucinaciones, disforia): prevenir con haloperidol o midazolam en dosis bajas. Hipertensión. Contraindicada en HTA no controlada, cardiopatía isquémica, HIC."},
+
+  {id:"levomepromazina",name:"Levomepromazina",cat:"Antipsicótico / Antiemético",grupo:"Sedación / Antiemético amplio",
+   atc:"N05AA02",invima:"Registros INVIMA vigentes.",
+   presentaciones:"Gotas 40mg/mL. Tab 25/100mg. Ampolla 25mg/mL.",
+   indicacion_invima:"Psicosis. Agitación. Dolor crónico severo.",
+   dosis_usual:"Antiemético: 3-6.25mg/día SC/VO. Sedación paliativa: 12.5-25mg SC c/4-8h o 50-200mg/24h ISCC.",
+   justificacion_tipos:{
+     nociceptivo_somatico:"Levomepromazina tiene propiedades analgésicas intrínsecas (bloqueo múltiples receptores). En dolor refractario, dosis bajas pueden coadyuvar a la analgesia.",
+     total:"Levomepromazina en cuidados paliativos: antiemético de amplio espectro (bloquea D2, 5-HT2, H1, ACh), sedación paliativa (alternativa o complemento a midazolam), agitación/delirium refractario, y coadyuvante analgésico. Registro INVIMA incluye dolor crónico severo."
+   },precauciones:"Hipotensión ortostática (especialmente primera dosis). Sedación marcada a dosis altas. Vía SC puede causar irritación local. Menor riesgo extrapiramidal que haloperidol pero mayor sedación."},
+
+  {id:"lidocaina_parche",name:"Lidocaína (parche tópico 5%)",cat:"Anestésico local tópico",grupo:"Dolor neuropático localizado",
+   atc:"N01BB02",invima:"Registros INVIMA vigentes para parches tópicos.",
+   presentaciones:"Parche tópico 5% (700mg lidocaína/parche).",
+   indicacion_invima:"Dolor neuropático localizado (neuralgia postherpética).",
+   dosis_usual:"Máx 3 parches simultáneos. 12h on / 12h off. Aplicar sobre piel intacta.",
+   justificacion_tipos:{
+     neuropatico:"Lidocaína tópica 5% con registro INVIMA para dolor neuropático localizado. Bloquea canales de sodio en fibras nerviosas periféricas dañadas. Primera línea en neuralgia postherpética y dolor neuropático localizado. Mínima absorción sistémica: excelente perfil de seguridad en ancianos.",
+     mixto:"Útil como coadyuvante tópico en dolor mixto con componente neuropático localizado. No interacciones sistémicas significativas.",
+     total:"Componente tópico del manejo multimodal del dolor. Especialmente valioso en ancianos y polifarmacia por ausencia de interacciones."
+   },precauciones:"Solo en piel intacta. No en mucosas. Dermatitis local posible. Mínima absorción sistémica. No cortar parches de algunas formulaciones."}
+];
+</script>

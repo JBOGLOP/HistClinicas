@@ -1,0 +1,321 @@
+// =============================================================
+// HC PALIATIVOS - Backend Apps Script
+// Esquema longitudinal: 1 paciente -> N evoluciones
+// Spreadsheet: 1wTrvlbIMDmDsOlPq6yOLUy3PXsuz5izrAmof7hYjLCc
+// =============================================================
+
+var SPREADSHEET_ID = '1wTrvlbIMDmDsOlPq6yOLUy3PXsuz5izrAmof7hYjLCc';
+var SHEET_PACIENTES = 'Pacientes';
+var SHEET_EVOLUCIONES = 'Evoluciones';
+
+// --- Columnas de Pacientes (datos estables del paciente) ---
+var PATIENT_COLS = [
+  'paciente_id', 'fecha_creacion', 'fecha_actualizacion',
+  'tipo_doc', 'num_doc',
+  'nombre1', 'nombre2', 'apellido1', 'apellido2',
+  'fecha_nac', 'sexo',
+  'eps', 'regimen', 'telefono',
+  'direccion', 'municipio', 'departamento', 'zona',
+  'cuidador_nombre', 'cuidador_parentesco', 'cuidador_tel',
+  'tipo_paciente', 'voluntad_anticipada'
+];
+
+// --- Columnas de Evoluciones (datos por visita) ---
+// Incluye institución, anamnesis, examen, todas las escalas y plan.
+var EVOLUCION_COLS = [
+  // Metadatos
+  'evolucion_id', 'paciente_id', 'fecha_registro',
+  // Institución y visita
+  'institucion', 'inst_nit', 'inst_cod', 'programa',
+  'fecha_atencion', 'tipo_atencion',
+  // Clasificación clínica
+  'estado_paciente', 'fase_enfermedad',
+  'dx_oncol', 'dx_principal',
+  // Historia clínica
+  'motivo_consulta', 'enfermedad_actual',
+  'ant_patologicos', 'ant_farmacologicos', 'ant_alergicos',
+  'ant_quirurgicos', 'ant_familiares', 'ant_toxicos',
+  'ant_transfusionales', 'ant_oncologicos',
+  'red_apoyo', 'aspectos_espirituales', 'socioeconomica', 'info_comunicacion',
+  // Examen físico
+  'sv_fc', 'sv_fr', 'sv_pa', 'sv_temp', 'sv_sato2',
+  'sv_peso', 'sv_talla', 'sv_imc',
+  'ef_general', 'ef_cabeza', 'ef_torax', 'ef_abdomen',
+  'ef_extremidades', 'ef_neuro', 'ef_piel', 'ef_otros',
+  // Escalas funcionales
+  'pps', 'kps', 'ecog',
+  'barthel_0', 'barthel_1', 'barthel_2', 'barthel_3', 'barthel_4',
+  'barthel_5', 'barthel_6', 'barthel_7', 'barthel_8', 'barthel_9',
+  'barthel_score',
+  // ESAS (10 síntomas, 0-10)
+  'esas_dolor', 'esas_fatiga', 'esas_nausea', 'esas_depresion',
+  'esas_ansiedad', 'esas_somnolencia', 'esas_apetito',
+  'esas_bienestar', 'esas_disnea', 'esas_otro',
+  'esas_total',
+  // Dolor
+  'eva_rest', 'eva_mov', 'eva_irr',
+  'dolor_loc', 'dolor_irrad', 'dolor_temp', 'dolor_tipo',
+  'dolor_alivia', 'dolor_empeora', 'dolor_desc',
+  // DN4 (10 items)
+  'dn4_0', 'dn4_1', 'dn4_2', 'dn4_3', 'dn4_4',
+  'dn4_5', 'dn4_6', 'dn4_7', 'dn4_8', 'dn4_9',
+  'dn4_score',
+  // PPI
+  'ppi_0', 'ppi_1', 'ppi_2', 'ppi_3', 'ppi_4', 'ppi_score',
+  // NECPAL
+  'necpal_sorpresa', 'necpal_demanda', 'necpal_indicadores',
+  'necpal_criterios', 'necpal_recursos', 'necpal_comorbilidad',
+  'necpal_resultado',
+  // SPICT
+  'spict_0', 'spict_1', 'spict_2', 'spict_3',
+  'spict_4', 'spict_5', 'spict_6', 'spict_score',
+  // CAM
+  'cam_0', 'cam_1', 'cam_2', 'cam_3', 'cam_positivo',
+  // Glasgow
+  'glasgow_0', 'glasgow_1', 'glasgow_2', 'glasgow_score',
+  // Norton
+  'norton_0', 'norton_1', 'norton_2', 'norton_3', 'norton_4', 'norton_score',
+  // IDC-Pal (paciente: 7 items, familia: 5 items, organizacion: 3 items)
+  'idc_p_0', 'idc_p_1', 'idc_p_2', 'idc_p_3', 'idc_p_4', 'idc_p_5', 'idc_p_6',
+  'idc_f_0', 'idc_f_1', 'idc_f_2', 'idc_f_3', 'idc_f_4',
+  'idc_o_0', 'idc_o_1', 'idc_o_2',
+  'idc_total',
+  // Análisis y diagnóstico
+  'analisis_clinico',
+  'dx1', 'dx2', 'dx3', 'dx4', 'dx_z515',
+  // Plan
+  'plan_no_farmaco', 'let_doc',
+  'prox_control', 'modalidad_control', 'signos_alarma', 'instrucciones',
+  'medico_nombre', 'medico_rm', 'medico_esp',
+  // Medicación prescrita (JSON con lista de prescribedMeds)
+  'meds_json', 'meds_resumen'
+];
+
+// =============================================================
+// ENTRY POINTS
+// =============================================================
+function doGet() {
+  return HtmlService.createTemplateFromFile('Index')
+    .evaluate()
+    .setTitle('Historia Clínica Paliativos')
+    .addMetaTag('viewport', 'width=device-width, initial-scale=1');
+}
+
+function include(filename) {
+  return HtmlService.createHtmlOutputFromFile(filename).getContent();
+}
+
+// =============================================================
+// SHEET HELPERS
+// =============================================================
+function getOrCreateSheet_(name, columns) {
+  var ss = SpreadsheetApp.openById(SPREADSHEET_ID);
+  var sheet = ss.getSheetByName(name);
+  if (!sheet) {
+    sheet = ss.insertSheet(name);
+  }
+  if (sheet.getLastRow() === 0) {
+    sheet.getRange(1, 1, 1, columns.length).setValues([columns]);
+    sheet.setFrozenRows(1);
+  } else {
+    // Asegurar que existan todas las columnas (agrega faltantes al final)
+    var existing = sheet.getRange(1, 1, 1, sheet.getLastColumn()).getValues()[0];
+    var missing = columns.filter(function(c) { return existing.indexOf(c) === -1; });
+    if (missing.length > 0) {
+      sheet.getRange(1, existing.length + 1, 1, missing.length).setValues([missing]);
+    }
+  }
+  return sheet;
+}
+
+function readAll_(sheet) {
+  var lastRow = sheet.getLastRow();
+  var lastCol = sheet.getLastColumn();
+  if (lastRow < 2) return { headers: sheet.getRange(1, 1, 1, lastCol).getValues()[0], rows: [] };
+  var headers = sheet.getRange(1, 1, 1, lastCol).getValues()[0];
+  var data = sheet.getRange(2, 1, lastRow - 1, lastCol).getValues();
+  var rows = data.map(function(row) {
+    var obj = {};
+    headers.forEach(function(h, i) { obj[h] = row[i]; });
+    return obj;
+  });
+  return { headers: headers, rows: rows };
+}
+
+function buildRow_(headers, record) {
+  return headers.map(function(h) {
+    var v = record[h];
+    return (v === undefined || v === null) ? '' : v;
+  });
+}
+
+function findRowIndex_(sheet, columnName, value) {
+  var lastRow = sheet.getLastRow();
+  if (lastRow < 2) return -1;
+  var headers = sheet.getRange(1, 1, 1, sheet.getLastColumn()).getValues()[0];
+  var idx = headers.indexOf(columnName);
+  if (idx === -1) return -1;
+  var col = sheet.getRange(2, idx + 1, lastRow - 1, 1).getValues();
+  for (var i = 0; i < col.length; i++) {
+    if (String(col[i][0]) === String(value)) return i + 2; // fila absoluta
+  }
+  return -1;
+}
+
+function nowIso_() {
+  return Utilities.formatDate(new Date(), Session.getScriptTimeZone(), 'yyyy-MM-dd HH:mm:ss');
+}
+
+// =============================================================
+// PACIENTES
+// =============================================================
+function listPacientes(filter) {
+  var sheet = getOrCreateSheet_(SHEET_PACIENTES, PATIENT_COLS);
+  var data = readAll_(sheet);
+  var rows = data.rows;
+  if (filter) {
+    var q = String(filter).toLowerCase().trim();
+    if (q.length > 0) {
+      rows = rows.filter(function(r) {
+        return ['nombre1','nombre2','apellido1','apellido2','num_doc']
+          .some(function(c) { return String(r[c] || '').toLowerCase().indexOf(q) !== -1; });
+      });
+    }
+  }
+  // Ordenar por apellido + nombre
+  rows.sort(function(a, b) {
+    var an = (a.apellido1 + ' ' + a.apellido2 + ' ' + a.nombre1).toLowerCase();
+    var bn = (b.apellido1 + ' ' + b.apellido2 + ' ' + b.nombre1).toLowerCase();
+    return an < bn ? -1 : (an > bn ? 1 : 0);
+  });
+  return rows.map(function(r) {
+    return {
+      paciente_id: r.paciente_id,
+      num_doc: r.num_doc,
+      tipo_doc: r.tipo_doc,
+      nombre_completo: [r.nombre1, r.nombre2, r.apellido1, r.apellido2].filter(Boolean).join(' '),
+      tipo_paciente: r.tipo_paciente,
+      fecha_actualizacion: r.fecha_actualizacion
+    };
+  });
+}
+
+function getPaciente(pacienteId) {
+  if (!pacienteId) return null;
+  var sheet = getOrCreateSheet_(SHEET_PACIENTES, PATIENT_COLS);
+  var data = readAll_(sheet);
+  for (var i = 0; i < data.rows.length; i++) {
+    if (String(data.rows[i].paciente_id) === String(pacienteId)) return data.rows[i];
+  }
+  return null;
+}
+
+function savePaciente(data) {
+  var sheet = getOrCreateSheet_(SHEET_PACIENTES, PATIENT_COLS);
+  var headers = sheet.getRange(1, 1, 1, sheet.getLastColumn()).getValues()[0];
+
+  var pacienteId = data.paciente_id;
+  var existingRow = -1;
+
+  if (pacienteId) {
+    existingRow = findRowIndex_(sheet, 'paciente_id', pacienteId);
+  }
+  // Si no hay id pero hay num_doc, intentar match por documento (evita duplicados)
+  if (existingRow === -1 && data.num_doc) {
+    existingRow = findRowIndex_(sheet, 'num_doc', data.num_doc);
+    if (existingRow !== -1) {
+      var idIdx = headers.indexOf('paciente_id');
+      pacienteId = sheet.getRange(existingRow, idIdx + 1).getValue();
+    }
+  }
+
+  if (!pacienteId) pacienteId = Utilities.getUuid();
+  data.paciente_id = pacienteId;
+  data.fecha_actualizacion = nowIso_();
+
+  if (existingRow === -1) {
+    data.fecha_creacion = nowIso_();
+    sheet.appendRow(buildRow_(headers, data));
+  } else {
+    // Preservar fecha_creacion previa
+    var fcIdx = headers.indexOf('fecha_creacion');
+    if (fcIdx !== -1) {
+      var prevFc = sheet.getRange(existingRow, fcIdx + 1).getValue();
+      if (prevFc) data.fecha_creacion = prevFc;
+    }
+    sheet.getRange(existingRow, 1, 1, headers.length).setValues([buildRow_(headers, data)]);
+  }
+
+  return { success: true, paciente_id: pacienteId, message: 'Paciente guardado correctamente.' };
+}
+
+// =============================================================
+// EVOLUCIONES
+// =============================================================
+function listEvoluciones(pacienteId) {
+  if (!pacienteId) return [];
+  var sheet = getOrCreateSheet_(SHEET_EVOLUCIONES, EVOLUCION_COLS);
+  var data = readAll_(sheet);
+  var rows = data.rows.filter(function(r) {
+    return String(r.paciente_id) === String(pacienteId);
+  });
+  // Más reciente primero (por fecha_atencion, si vacía caer a fecha_registro)
+  rows.sort(function(a, b) {
+    var af = a.fecha_atencion || a.fecha_registro || '';
+    var bf = b.fecha_atencion || b.fecha_registro || '';
+    return af < bf ? 1 : (af > bf ? -1 : 0);
+  });
+  return rows.map(function(r) {
+    return {
+      evolucion_id: r.evolucion_id,
+      fecha_atencion: r.fecha_atencion,
+      fecha_registro: r.fecha_registro,
+      tipo_atencion: r.tipo_atencion,
+      dx_principal: r.dx_principal,
+      pps: r.pps,
+      ecog: r.ecog,
+      esas_total: r.esas_total,
+      medico_nombre: r.medico_nombre
+    };
+  });
+}
+
+function getEvolucion(evolucionId) {
+  if (!evolucionId) return null;
+  var sheet = getOrCreateSheet_(SHEET_EVOLUCIONES, EVOLUCION_COLS);
+  var data = readAll_(sheet);
+  for (var i = 0; i < data.rows.length; i++) {
+    if (String(data.rows[i].evolucion_id) === String(evolucionId)) return data.rows[i];
+  }
+  return null;
+}
+
+function saveEvolucion(data) {
+  if (!data.paciente_id) {
+    return { success: false, message: 'Falta paciente_id. Guarda primero el paciente.' };
+  }
+  var sheet = getOrCreateSheet_(SHEET_EVOLUCIONES, EVOLUCION_COLS);
+  var headers = sheet.getRange(1, 1, 1, sheet.getLastColumn()).getValues()[0];
+
+  var evolucionId = data.evolucion_id;
+  var existingRow = evolucionId ? findRowIndex_(sheet, 'evolucion_id', evolucionId) : -1;
+
+  if (!evolucionId) evolucionId = Utilities.getUuid();
+  data.evolucion_id = evolucionId;
+  data.fecha_registro = data.fecha_registro || nowIso_();
+
+  if (existingRow === -1) {
+    sheet.appendRow(buildRow_(headers, data));
+  } else {
+    sheet.getRange(existingRow, 1, 1, headers.length).setValues([buildRow_(headers, data)]);
+  }
+
+  return { success: true, evolucion_id: evolucionId, message: 'Evolución guardada correctamente.' };
+}
+
+// =============================================================
+// UTIL: devolver definición de columnas al cliente (opcional)
+// =============================================================
+function getFieldDefinitions() {
+  return { patient: PATIENT_COLS, evolucion: EVOLUCION_COLS };
+}
