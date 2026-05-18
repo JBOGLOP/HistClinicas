@@ -21,7 +21,6 @@ var PATIENT_COLS = [
 ];
 
 // --- Columnas de Evoluciones (datos por visita) ---
-// Incluye institución, anamnesis, examen, todas las escalas y plan.
 var EVOLUCION_COLS = [
   // Metadatos
   'evolucion_id', 'paciente_id', 'fecha_registro',
@@ -75,7 +74,7 @@ var EVOLUCION_COLS = [
   'glasgow_0', 'glasgow_1', 'glasgow_2', 'glasgow_score',
   // Norton
   'norton_0', 'norton_1', 'norton_2', 'norton_3', 'norton_4', 'norton_score',
-  // IDC-Pal (paciente: 7 items, familia: 5 items, organizacion: 3 items)
+  // IDC-Pal (paciente: 7, familia: 5, organización: 3)
   'idc_p_0', 'idc_p_1', 'idc_p_2', 'idc_p_3', 'idc_p_4', 'idc_p_5', 'idc_p_6',
   'idc_f_0', 'idc_f_1', 'idc_f_2', 'idc_f_3', 'idc_f_4',
   'idc_o_0', 'idc_o_1', 'idc_o_2',
@@ -95,10 +94,36 @@ var EVOLUCION_COLS = [
 // ENTRY POINTS
 // =============================================================
 function doGet() {
-  return HtmlService.createTemplateFromFile('Index')
-    .evaluate()
-    .setTitle('Historia Clínica Paliativos')
-    .addMetaTag('viewport', 'width=device-width, initial-scale=1');
+  try {
+    return HtmlService.createTemplateFromFile('Index')
+      .evaluate()
+      .setTitle('Historia Clínica Paliativos')
+      .addMetaTag('viewport', 'width=device-width, initial-scale=1');
+  } catch (e) {
+    // Error amigable cuando faltan los archivos HTML en el proyecto
+    var msg = String(e && e.message || e);
+    var html =
+      '<!doctype html><html><head><meta charset="utf-8">' +
+      '<title>HC Paliativos · Configuración pendiente</title>' +
+      '<style>body{font-family:system-ui,Arial,sans-serif;max-width:720px;margin:40px auto;padding:0 20px;color:#2c3e50}' +
+      'h1{color:#c0392b;font-size:20px}h2{color:#1a5276;font-size:15px;margin-top:24px}' +
+      'code{background:#f4f6f8;padding:2px 6px;border-radius:4px;font-size:13px}' +
+      '.box{background:#fdedec;border-left:4px solid #c0392b;padding:12px 16px;border-radius:6px;margin:16px 0}' +
+      'ol li{margin-bottom:8px}</style></head><body>' +
+      '<h1>⚠️ Configuración del proyecto Apps Script incompleta</h1>' +
+      '<div class="box"><strong>Error:</strong> ' + msg + '</div>' +
+      '<h2>Cómo resolverlo</h2>' +
+      '<ol>' +
+      '<li>En el editor de Apps Script, panel <strong>Archivos</strong>, clic en <strong>+</strong> → <strong>HTML</strong>.</li>' +
+      '<li>Nombrarlo exactamente <code>Index</code> (sin <code>.html</code>, con <strong>I mayúscula</strong>).</li>' +
+      '<li>Borrar el contenido por defecto y pegar el contenido de <code>Index.html</code> del repo.</li>' +
+      '<li>Repetir: <strong>+</strong> → <strong>HTML</strong> → nombrarlo <code>Meds</code> y pegar <code>Meds.html</code>.</li>' +
+      '<li>Guardar (Ctrl+S) y volver a probar.</li>' +
+      '</ol>' +
+      '<p style="font-size:12px;color:#7f8c8d">Si después de crear los archivos el error persiste, ejecutá <code>healthCheck</code> desde el editor.</p>' +
+      '</body></html>';
+    return HtmlService.createHtmlOutput(html).setTitle('HC Paliativos · Setup');
+  }
 }
 
 function include(filename) {
@@ -128,15 +153,27 @@ function getOrCreateSheet_(name, columns) {
   return sheet;
 }
 
+// Normaliza valores leídos de Sheet: Date -> string ISO ('YYYY-MM-DD' o 'YYYY-MM-DDTHH:mm')
+// para que los <input type="date"> / <input type="datetime-local"> los acepten al recargar.
+function normalizeCell_(v) {
+  if (v instanceof Date) {
+    var iso = Utilities.formatDate(v, Session.getScriptTimeZone(), "yyyy-MM-dd'T'HH:mm:ss");
+    return iso.slice(11, 19) === '00:00:00' ? iso.slice(0, 10) : iso.slice(0, 16);
+  }
+  return v;
+}
+
 function readAll_(sheet) {
   var lastRow = sheet.getLastRow();
   var lastCol = sheet.getLastColumn();
-  if (lastRow < 2) return { headers: sheet.getRange(1, 1, 1, lastCol).getValues()[0], rows: [] };
+  if (lastRow < 2) {
+    return { headers: sheet.getRange(1, 1, 1, lastCol).getValues()[0], rows: [] };
+  }
   var headers = sheet.getRange(1, 1, 1, lastCol).getValues()[0];
   var data = sheet.getRange(2, 1, lastRow - 1, lastCol).getValues();
   var rows = data.map(function(row) {
     var obj = {};
-    headers.forEach(function(h, i) { obj[h] = row[i]; });
+    headers.forEach(function(h, i) { obj[h] = normalizeCell_(row[i]); });
     return obj;
   });
   return { headers: headers, rows: rows };
@@ -157,7 +194,7 @@ function findRowIndex_(sheet, columnName, value) {
   if (idx === -1) return -1;
   var col = sheet.getRange(2, idx + 1, lastRow - 1, 1).getValues();
   for (var i = 0; i < col.length; i++) {
-    if (String(col[i][0]) === String(value)) return i + 2; // fila absoluta
+    if (String(col[i][0]) === String(value)) return i + 2;
   }
   return -1;
 }
@@ -182,7 +219,6 @@ function listPacientes(filter) {
       });
     }
   }
-  // Ordenar por apellido + nombre
   rows.sort(function(a, b) {
     var an = (a.apellido1 + ' ' + a.apellido2 + ' ' + a.nombre1).toLowerCase();
     var bn = (b.apellido1 + ' ' + b.apellido2 + ' ' + b.nombre1).toLowerCase();
@@ -237,7 +273,6 @@ function savePaciente(data) {
     data.fecha_creacion = nowIso_();
     sheet.appendRow(buildRow_(headers, data));
   } else {
-    // Preservar fecha_creacion previa
     var fcIdx = headers.indexOf('fecha_creacion');
     if (fcIdx !== -1) {
       var prevFc = sheet.getRange(existingRow, fcIdx + 1).getValue();
@@ -259,10 +294,9 @@ function listEvoluciones(pacienteId) {
   var rows = data.rows.filter(function(r) {
     return String(r.paciente_id) === String(pacienteId);
   });
-  // Más reciente primero (por fecha_atencion, si vacía caer a fecha_registro)
   rows.sort(function(a, b) {
-    var af = a.fecha_atencion || a.fecha_registro || '';
-    var bf = b.fecha_atencion || b.fecha_registro || '';
+    var af = String(a.fecha_atencion || a.fecha_registro || '');
+    var bf = String(b.fecha_atencion || b.fecha_registro || '');
     return af < bf ? 1 : (af > bf ? -1 : 0);
   });
   return rows.map(function(r) {
@@ -313,9 +347,66 @@ function saveEvolucion(data) {
   return { success: true, evolucion_id: evolucionId, message: 'Evolución guardada correctamente.' };
 }
 
+function deleteEvolucion(evolucionId) {
+  if (!evolucionId) return { success: false, message: 'Falta evolucion_id.' };
+  var sheet = getOrCreateSheet_(SHEET_EVOLUCIONES, EVOLUCION_COLS);
+  var row = findRowIndex_(sheet, 'evolucion_id', evolucionId);
+  if (row === -1) return { success: false, message: 'Evolución no encontrada.' };
+  sheet.deleteRow(row);
+  return { success: true, message: 'Evolución eliminada.' };
+}
+
 // =============================================================
-// UTIL: devolver definición de columnas al cliente (opcional)
+// UTIL / OPS
 // =============================================================
+
+// Devuelve definición de columnas al cliente (opcional).
 function getFieldDefinitions() {
   return { patient: PATIENT_COLS, evolucion: EVOLUCION_COLS };
+}
+
+// Ejecutar UNA VEZ desde el editor (Ejecutar > setup) para crear hojas + encabezados
+// sin necesidad de abrir la web app. Útil si Index.html aún no existe.
+function setup() {
+  var pSheet = getOrCreateSheet_(SHEET_PACIENTES, PATIENT_COLS);
+  var eSheet = getOrCreateSheet_(SHEET_EVOLUCIONES, EVOLUCION_COLS);
+  var msg = 'Hojas listas: "' + pSheet.getName() + '" (' + PATIENT_COLS.length + ' cols) y "' +
+            eSheet.getName() + '" (' + EVOLUCION_COLS.length + ' cols).';
+  Logger.log(msg);
+  return msg;
+}
+
+// Verificación rápida desde el editor: confirma acceso al spreadsheet y a las hojas.
+// Ejecutar > healthCheck → ver Registro de ejecución.
+function healthCheck() {
+  var report = { ok: true, checks: [] };
+  try {
+    var ss = SpreadsheetApp.openById(SPREADSHEET_ID);
+    report.checks.push({ name: 'openById', ok: true, info: ss.getName() });
+  } catch (e) {
+    report.ok = false;
+    report.checks.push({ name: 'openById', ok: false, error: String(e) });
+    Logger.log(JSON.stringify(report, null, 2));
+    return report;
+  }
+  ['Pacientes','Evoluciones'].forEach(function(name) {
+    try {
+      var s = getOrCreateSheet_(name, name === 'Pacientes' ? PATIENT_COLS : EVOLUCION_COLS);
+      report.checks.push({ name: 'sheet:' + name, ok: true, rows: s.getLastRow() - 1 });
+    } catch (e) {
+      report.ok = false;
+      report.checks.push({ name: 'sheet:' + name, ok: false, error: String(e) });
+    }
+  });
+  ['Index','Meds'].forEach(function(name) {
+    try {
+      HtmlService.createHtmlOutputFromFile(name);
+      report.checks.push({ name: 'html:' + name, ok: true });
+    } catch (e) {
+      report.ok = false;
+      report.checks.push({ name: 'html:' + name, ok: false, error: String(e) });
+    }
+  });
+  Logger.log(JSON.stringify(report, null, 2));
+  return report;
 }
