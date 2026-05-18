@@ -1,1 +1,1669 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Historia Clínica - Cuidados Paliativos</title>
+<style>
+@import url('https://fonts.googleapis.com/css2?family=Source+Sans+3:wght@300;400;600;700&family=Merriweather:wght@700&display=swap');
+*{margin:0;padding:0;box-sizing:border-box}
+:root{
+--bg:#f4f6f8;--card:#fff;--primary:#1a5276;--primary-light:#2980b9;--accent:#27ae60;
+--danger:#c0392b;--warning:#f39c12;--text:#2c3e50;--text-light:#7f8c8d;--border:#dce1e5;
+--section-bg:#eaf2f8;--header-gradient:linear-gradient(135deg,#1a5276 0%,#2980b9 100%);
+--scale-oncol:#e8f6f3;--scale-nononcol:#fef9e7;--scale-dolor:#fdedec;--scale-func:#eaf2f8;
+--scale-prog:#f4ecf7;--scale-other:#f0f3f4;
+}
+body{font-family:'Source Sans 3',system-ui,sans-serif;background:var(--bg);color:var(--text);font-size:14px;line-height:1.5}
+.app-header{background:var(--header-gradient);color:#fff;padding:16px 24px;display:flex;align-items:center;justify-content:space-between;position:sticky;top:0;z-index:100;box-shadow:0 2px 8px rgba(0,0,0,.15)}
+.app-header h1{font-family:'Merriweather',serif;font-size:18px;letter-spacing:.5px}
+.app-header .subtitle{font-size:12px;opacity:.8;margin-top:2px}
+.header-actions{display:flex;gap:8px}
+.header-actions button{background:rgba(255,255,255,.15);border:1px solid rgba(255,255,255,.3);color:#fff;padding:6px 14px;border-radius:6px;cursor:pointer;font-size:12px;font-weight:600;transition:.2s}
+.header-actions button:hover{background:rgba(255,255,255,.25)}
+.header-actions button.save-btn{background:var(--accent);border-color:var(--accent)}
+.container{max-width:1100px;margin:0 auto;padding:16px}
+.nav-tabs{display:flex;flex-wrap:wrap;gap:4px;margin-bottom:16px;background:var(--card);padding:8px;border-radius:10px;box-shadow:0 1px 3px rgba(0,0,0,.08)}
+.nav-tab{padding:8px 14px;border:none;background:none;cursor:pointer;font-size:12px;font-weight:600;color:var(--text-light);border-radius:6px;transition:.2s;white-space:nowrap}
+.nav-tab:hover{background:var(--section-bg);color:var(--primary)}
+.nav-tab.active{background:var(--primary);color:#fff}
+.tab-content{display:none}.tab-content.active{display:block}
+.card{background:var(--card);border-radius:10px;padding:20px;margin-bottom:16px;box-shadow:0 1px 3px rgba(0,0,0,.06);border:1px solid var(--border)}
+.card-title{font-family:'Merriweather',serif;font-size:15px;color:var(--primary);margin-bottom:14px;padding-bottom:8px;border-bottom:2px solid var(--primary-light);display:flex;align-items:center;gap:8px}
+.card-title .icon{font-size:18px}
+.form-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(220px,1fr));gap:12px}
+.form-grid.cols-2{grid-template-columns:1fr 1fr}
+.form-grid.cols-3{grid-template-columns:1fr 1fr 1fr}
+.form-grid.cols-4{grid-template-columns:1fr 1fr 1fr 1fr}
+.form-group{display:flex;flex-direction:column;gap:4px}
+.form-group label{font-size:11px;font-weight:600;color:var(--text-light);text-transform:uppercase;letter-spacing:.5px}
+.form-group input,.form-group select,.form-group textarea{padding:8px 10px;border:1px solid var(--border);border-radius:6px;font-size:13px;font-family:inherit;transition:.2s}
+.form-group input:focus,.form-group select:focus,.form-group textarea:focus{outline:none;border-color:var(--primary-light);box-shadow:0 0 0 3px rgba(41,128,185,.1)}
+.form-group textarea{resize:vertical;min-height:80px}
+.form-group.full-width{grid-column:1/-1}
+/* Scale styling */
+.scale-card{border-left:4px solid var(--primary)}
+.scale-card.oncol{border-left-color:#1abc9c;background:var(--scale-oncol)}
+.scale-card.nononcol{border-left-color:#f1c40f;background:var(--scale-nononcol)}
+.scale-card.dolor{border-left-color:#e74c3c;background:var(--scale-dolor)}
+.scale-card.func{border-left-color:#3498db;background:var(--scale-func)}
+.scale-card.prog{border-left-color:#9b59b6;background:var(--scale-prog)}
+.scale-card.other{border-left-color:#95a5a6;background:var(--scale-other)}
+.scale-badge{display:inline-block;padding:2px 8px;border-radius:10px;font-size:10px;font-weight:700;text-transform:uppercase;letter-spacing:.5px}
+.badge-oncol{background:#1abc9c;color:#fff}.badge-nononcol{background:#f1c40f;color:#333}
+.badge-dolor{background:#e74c3c;color:#fff}.badge-func{background:#3498db;color:#fff}
+.badge-prog{background:#9b59b6;color:#fff}.badge-other{background:#95a5a6;color:#fff}
+.scale-result{background:rgba(255,255,255,.7);border-radius:8px;padding:12px;margin-top:10px;border:1px solid rgba(0,0,0,.05)}
+.scale-result .score{font-size:28px;font-weight:700;color:var(--primary)}
+.scale-result .interpretation{font-size:13px;margin-top:4px;color:var(--text)}
+.scale-options{display:flex;flex-direction:column;gap:6px;margin-top:6px}
+.scale-option{display:flex;align-items:center;gap:8px;padding:6px 10px;border-radius:6px;cursor:pointer;transition:.15s;border:1px solid transparent}
+.scale-option:hover{background:rgba(255,255,255,.5);border-color:var(--border)}
+.scale-option input[type="radio"],.scale-option input[type="checkbox"]{accent-color:var(--primary)}
+.scale-option label{cursor:pointer;font-size:13px;flex:1}
+.scale-option .opt-score{font-size:11px;font-weight:700;color:var(--primary-light);min-width:30px}
+/* EVA slider */
+.eva-container{position:relative;padding:20px 0}
+.eva-slider{width:100%;-webkit-appearance:none;height:12px;border-radius:6px;outline:none;transition:.2s}
+.eva-slider::-webkit-slider-thumb{-webkit-appearance:none;width:28px;height:28px;border-radius:50%;cursor:pointer;border:3px solid #fff;box-shadow:0 2px 6px rgba(0,0,0,.2)}
+.eva-labels{display:flex;justify-content:space-between;margin-top:6px;font-size:11px;color:var(--text-light)}
+.eva-value{text-align:center;font-size:36px;font-weight:700;margin-bottom:8px}
+/* Medication module */
+.med-entry{background:#f8f9fa;border:1px solid var(--border);border-radius:8px;padding:14px;margin-bottom:10px;position:relative}
+.med-entry .med-header{display:flex;align-items:center;justify-content:space-between;margin-bottom:10px}
+.med-entry .med-name{font-weight:700;color:var(--primary);font-size:14px}
+.med-remove{background:var(--danger);color:#fff;border:none;border-radius:50%;width:24px;height:24px;cursor:pointer;font-size:14px;line-height:1}
+.justification-box{background:#fff;border:1px solid #d5f5e3;border-radius:6px;padding:10px;margin-top:8px}
+.justification-box .just-title{font-size:11px;font-weight:700;color:var(--accent);text-transform:uppercase;margin-bottom:4px}
+.justification-box .just-content{font-size:12px;line-height:1.6;color:var(--text)}
+.invima-badge{display:inline-flex;align-items:center;gap:4px;background:#e8f5e9;color:#2e7d32;padding:2px 8px;border-radius:4px;font-size:10px;font-weight:700}
+.add-med-btn{background:var(--primary);color:#fff;border:none;padding:10px 20px;border-radius:8px;cursor:pointer;font-size:13px;font-weight:600;display:flex;align-items:center;gap:6px;transition:.2s}
+.add-med-btn:hover{background:var(--primary-light)}
+.med-selector{position:relative}
+.med-search{width:100%;padding:10px;border:2px solid var(--primary-light);border-radius:8px;font-size:14px}
+.med-dropdown{position:absolute;top:100%;left:0;right:0;background:#fff;border:1px solid var(--border);border-radius:0 0 8px 8px;max-height:300px;overflow-y:auto;z-index:50;box-shadow:0 4px 12px rgba(0,0,0,.1);display:none}
+.med-dropdown.show{display:block}
+.med-dropdown-item{padding:10px 12px;cursor:pointer;border-bottom:1px solid #f0f0f0;transition:.1s}
+.med-dropdown-item:hover{background:var(--section-bg)}
+.med-dropdown-item .med-d-name{font-weight:700;font-size:13px}
+.med-dropdown-item .med-d-cat{font-size:10px;color:var(--text-light)}
+.med-dropdown-item .med-d-ind{font-size:11px;color:var(--accent);margin-top:2px}
+/* Alert levels */
+.alert-box{padding:10px 14px;border-radius:6px;margin-bottom:8px;font-size:13px;display:flex;align-items:center;gap:8px}
+.alert-info{background:#eaf2f8;border-left:4px solid var(--primary-light);color:var(--primary)}
+.alert-success{background:#e8f8f5;border-left:4px solid var(--accent);color:#1e8449}
+.alert-warning{background:#fef9e7;border-left:4px solid var(--warning);color:#7d6608}
+.alert-danger{background:#fdedec;border-left:4px solid var(--danger);color:var(--danger)}
+/* Print / PDF Export */
+@media print{
+.app-header{position:static;background:var(--header-gradient);-webkit-print-color-adjust:exact;print-color-adjust:exact;padding:12px 20px}
+.app-header .subtitle{display:block}
+.header-actions,.nav-tabs,.med-remove,.add-med-btn,.med-selector,.no-print{display:none!important}
+.tab-content{display:block!important;page-break-before:auto}
+.card{break-inside:avoid;box-shadow:none;border:1px solid #ccc;page-break-inside:avoid;margin-bottom:10px;padding:14px}
+body{font-size:10px;background:#fff;-webkit-print-color-adjust:exact;print-color-adjust:exact}
+.container{max-width:100%;padding:0 10px}
+.card-title{font-size:12px;margin-bottom:8px;padding-bottom:4px}
+.form-group label{font-size:9px}
+.form-group input,.form-group select,.form-group textarea{border:none;border-bottom:1px solid #ccc;border-radius:0;padding:4px 2px;font-size:10px;min-height:auto}
+.form-group textarea{min-height:30px}
+.scale-card{-webkit-print-color-adjust:exact;print-color-adjust:exact;break-inside:avoid}
+.scale-option{padding:2px 4px}
+.scale-option label{font-size:10px}
+.scale-result{padding:8px;margin-top:6px}
+.scale-result .score{font-size:20px}
+.scale-result .interpretation{font-size:10px}
+.eva-slider{display:none}
+.eva-value{font-size:18px!important}
+.eva-labels{font-size:9px}
+.med-entry{break-inside:avoid;padding:10px;margin-bottom:8px}
+.justification-box{break-inside:avoid}
+.justification-box .just-content{font-size:10px}
+.alert-box{font-size:10px;padding:6px 10px;break-inside:avoid}
+.scale-badge{font-size:8px;padding:1px 6px}
+.invima-badge{font-size:8px}
+.form-grid{gap:6px}
+input[type="range"]{-webkit-appearance:none;background:transparent;height:0;overflow:hidden}
+}
+/* Extra class for PDF export mode */
+.printing-pdf .tab-content{display:block!important}
+.printing-pdf .nav-tabs{display:none!important}
+.printing-pdf .header-actions{display:none!important}
+/* Responsive */
+@media(max-width:768px){
+.form-grid.cols-3,.form-grid.cols-4{grid-template-columns:1fr 1fr}
+.nav-tab{font-size:11px;padding:6px 10px}
+}
+.collapse-toggle{cursor:pointer;user-select:none;display:flex;align-items:center;gap:6px}
+.collapse-toggle::before{content:'▼';font-size:10px;transition:.2s;display:inline-block}
+.collapse-toggle.collapsed::before{transform:rotate(-90deg)}
+.collapse-content{overflow:hidden;transition:max-height .3s ease}
+.collapse-content.collapsed{max-height:0!important;overflow:hidden;padding:0!important;margin:0!important}
+.dn4-grid{display:grid;grid-template-columns:1fr 1fr;gap:8px}
+</style>
+</head>
+<body>
 
+<div class="app-header">
+<div>
+<h1>📋 Historia Clínica de Cuidados Paliativos</h1>
+<div class="subtitle">Formato integral con escalas validadas y justificación farmacológica INVIMA</div>
+</div>
+<div class="header-actions">
+<button onclick="clearForm()">🗑 Nuevo</button>
+<button onclick="saveToStorage()" class="save-btn">💾 Guardar</button>
+<button onclick="exportPDF()">📤 Exportar PDF</button>
+<button onclick="exportPDF()">🖨 Imprimir/PDF</button>
+</div>
+</div>
+
+<div class="container">
+<div class="nav-tabs" id="navTabs">
+<button class="nav-tab active" data-tab="tab-id">📌 Identificación</button>
+<button class="nav-tab" data-tab="tab-hc">📝 Historia Clínica</button>
+<button class="nav-tab" data-tab="tab-ef">🩺 Examen Físico</button>
+<button class="nav-tab" data-tab="tab-escalas-func">📊 Funcionalidad</button>
+<button class="nav-tab" data-tab="tab-escalas-sint">🌡 Síntomas (ESAS)</button>
+<button class="nav-tab" data-tab="tab-escalas-dolor">🔥 Dolor</button>
+<button class="nav-tab" data-tab="tab-escalas-prog">📈 Pronóstico</button>
+<button class="nav-tab" data-tab="tab-escalas-other">🧩 Otras Escalas</button>
+<button class="nav-tab" data-tab="tab-dx">🔍 Análisis / Dx</button>
+<button class="nav-tab" data-tab="tab-plan">💊 Plan de Manejo</button>
+</div>
+
+<!-- TAB: IDENTIFICACIÓN -->
+<div class="tab-content active" id="tab-id">
+<div class="card">
+<div class="card-title"><span class="icon">🏥</span> Datos de la Institución</div>
+<div class="form-grid cols-3">
+<div class="form-group"><label>Institución</label><input type="text" id="institucion"></div>
+<div class="form-group"><label>NIT</label><input type="text" id="inst_nit"></div>
+<div class="form-group"><label>Código de Habilitación</label><input type="text" id="inst_cod"></div>
+<div class="form-group"><label>Programa</label><input type="text" id="programa" value="Cuidados Paliativos"></div>
+<div class="form-group"><label>Fecha de atención</label><input type="datetime-local" id="fecha_atencion"></div>
+<div class="form-group"><label>Tipo de atención</label>
+<select id="tipo_atencion"><option>Consulta</option><option>Interconsulta</option><option>Visita domiciliaria</option><option>Telemedicina</option><option>Hospitalización</option><option>Urgencias</option></select>
+</div>
+</div>
+</div>
+<div class="card">
+<div class="card-title"><span class="icon">👤</span> Identificación del Paciente</div>
+<div class="form-grid cols-4">
+<div class="form-group"><label>Primer Nombre</label><input type="text" id="nombre1"></div>
+<div class="form-group"><label>Segundo Nombre</label><input type="text" id="nombre2"></div>
+<div class="form-group"><label>Primer Apellido</label><input type="text" id="apellido1"></div>
+<div class="form-group"><label>Segundo Apellido</label><input type="text" id="apellido2"></div>
+<div class="form-group"><label>Tipo de Documento</label>
+<select id="tipo_doc"><option>CC</option><option>TI</option><option>CE</option><option>PA</option><option>RC</option><option>MS</option><option>AS</option></select>
+</div>
+<div class="form-group"><label>Número de Documento</label><input type="text" id="num_doc"></div>
+<div class="form-group"><label>Fecha de Nacimiento</label><input type="date" id="fecha_nac" onchange="calcEdad()" oninput="calcEdad()"></div>
+<div class="form-group"><label>Edad</label><input type="text" id="edad" placeholder="Se calcula automáticamente"></div>
+<div class="form-group"><label>Sexo</label>
+<select id="sexo"><option>Masculino</option><option>Femenino</option><option>Indeterminado</option></select>
+</div>
+<div class="form-group"><label>EPS / Aseguradora</label><input type="text" id="eps"></div>
+<div class="form-group"><label>Régimen</label>
+<select id="regimen"><option>Contributivo</option><option>Subsidiado</option><option>Especial</option><option>Vinculado</option><option>Particular</option></select>
+</div>
+<div class="form-group"><label>Teléfono</label><input type="tel" id="telefono"></div>
+<div class="form-group full-width"><label>Dirección de residencia</label><input type="text" id="direccion"></div>
+<div class="form-group"><label>Municipio</label><input type="text" id="municipio"></div>
+<div class="form-group"><label>Departamento</label><input type="text" id="departamento"></div>
+<div class="form-group"><label>Zona</label>
+<select id="zona"><option>Urbana</option><option>Rural</option></select>
+</div>
+</div>
+</div>
+<div class="card">
+<div class="card-title"><span class="icon">👥</span> Cuidador / Acompañante</div>
+<div class="form-grid cols-3">
+<div class="form-group"><label>Nombre del cuidador principal</label><input type="text" id="cuidador_nombre"></div>
+<div class="form-group"><label>Parentesco</label><input type="text" id="cuidador_parentesco"></div>
+<div class="form-group"><label>Teléfono</label><input type="tel" id="cuidador_tel"></div>
+</div>
+</div>
+<div class="card">
+<div class="card-title"><span class="icon">📋</span> Clasificación del Paciente</div>
+<div class="form-grid cols-3">
+<div class="form-group"><label>Tipo de paciente</label>
+<select id="tipo_paciente" onchange="toggleOncologico()">
+<option value="oncologico">Oncológico</option>
+<option value="no_oncologico">No oncológico</option>
+</select></div>
+<div class="form-group"><label>Estado del paciente</label>
+<select id="estado_paciente"><option>Expectante</option><option>Activo</option><option>Pasivo</option></select>
+</div>
+<div class="form-group"><label>Fase de enfermedad</label>
+<select id="fase_enfermedad"><option>Estable</option><option>Inestable</option><option>En deterioro</option><option>Agonía</option></select>
+</div>
+<div class="form-group" id="div_dx_oncol"><label>Diagnóstico oncológico (CIE-10)</label><input type="text" id="dx_oncol" placeholder="Ej: C34.1 - Ca de pulmón lóbulo superior"></div>
+<div class="form-group"><label>Diagnóstico principal (CIE-10)</label><input type="text" id="dx_principal"></div>
+<div class="form-group"><label>Voluntad anticipada</label>
+<select id="voluntad_anticipada"><option>No tiene</option><option>Sí - Documento suscrito</option><option>Sí - Verbal ante testigos</option><option>En proceso</option></select>
+</div>
+</div>
+</div>
+</div>
+
+<!-- TAB: HISTORIA CLÍNICA -->
+<div class="tab-content" id="tab-hc">
+<div class="card">
+<div class="card-title"><span class="icon">🎯</span> Motivo de Consulta</div>
+<div class="form-group full-width"><textarea id="motivo_consulta" rows="3" placeholder="Describa el motivo de consulta en palabras del paciente/cuidador..."></textarea></div>
+</div>
+<div class="card">
+<div class="card-title"><span class="icon">📖</span> Enfermedad Actual</div>
+<div class="form-group full-width"><textarea id="enfermedad_actual" rows="8" placeholder="Describa cronológicamente la enfermedad actual, incluyendo: tiempo de evolución, síntomas principales, tratamientos previos, respuesta a analgesia, funcionalidad, impacto en calidad de vida. Incluir características del dolor (localización, intensidad, tipo, irradiación, factores moduladores, temporalidad)..."></textarea></div>
+</div>
+<div class="card">
+<div class="card-title"><span class="icon">📚</span> Antecedentes</div>
+<div class="form-group full-width"><label>Patológicos</label><textarea id="ant_patologicos" rows="3" placeholder="Enfermedades crónicas, hospitalizaciones previas, cirugías..."></textarea></div>
+<div class="form-group full-width" style="margin-top:10px"><label>Farmacológicos (medicamentos actuales)</label><textarea id="ant_farmacologicos" rows="3" placeholder="Liste todos los medicamentos actuales con dosis, frecuencia y vía..."></textarea></div>
+<div class="form-group full-width" style="margin-top:10px"><label>Alérgicos</label><textarea id="ant_alergicos" rows="2" placeholder="Alergias conocidas a medicamentos, alimentos u otros..."></textarea></div>
+<div class="form-grid cols-2" style="margin-top:10px">
+<div class="form-group"><label>Quirúrgicos</label><textarea id="ant_quirurgicos" rows="2"></textarea></div>
+<div class="form-group"><label>Familiares</label><textarea id="ant_familiares" rows="2"></textarea></div>
+<div class="form-group"><label>Tóxicos</label><textarea id="ant_toxicos" rows="2"></textarea></div>
+<div class="form-group"><label>Transfusionales</label><textarea id="ant_transfusionales" rows="2"></textarea></div>
+</div>
+<div class="form-group full-width" style="margin-top:10px"><label>Historia oncológica (si aplica)</label><textarea id="ant_oncologicos" rows="3" placeholder="Tipo histológico, estadío, fecha de diagnóstico, tratamientos oncológicos recibidos (QT, RT, cirugía), estado actual de la enfermedad, metástasis..."></textarea></div>
+</div>
+<div class="card">
+<div class="card-title"><span class="icon">🏠</span> Valoración Psicosocial y Espiritual</div>
+<div class="form-grid cols-2">
+<div class="form-group"><label>Red de apoyo familiar</label><textarea id="red_apoyo" rows="3" placeholder="Estructura familiar, cuidador principal, dinámica, claudicación..."></textarea></div>
+<div class="form-group"><label>Aspectos espirituales / existenciales</label><textarea id="aspectos_espirituales" rows="3" placeholder="Creencias, necesidades espirituales, sufrimiento existencial..."></textarea></div>
+<div class="form-group"><label>Situación socioeconómica</label><textarea id="socioeconomica" rows="2"></textarea></div>
+<div class="form-group"><label>Información y comunicación</label><textarea id="info_comunicacion" rows="2" placeholder="¿Qué sabe el paciente de su enfermedad? Conspiración del silencio..."></textarea></div>
+</div>
+</div>
+</div>
+
+<!-- TAB: EXAMEN FÍSICO -->
+<div class="tab-content" id="tab-ef">
+<div class="card">
+<div class="card-title"><span class="icon">📊</span> Signos Vitales</div>
+<div class="form-grid cols-4">
+<div class="form-group"><label>FC (lpm)</label><input type="number" id="sv_fc"></div>
+<div class="form-group"><label>FR (rpm)</label><input type="number" id="sv_fr"></div>
+<div class="form-group"><label>PA (mmHg)</label><input type="text" id="sv_pa" placeholder="120/80"></div>
+<div class="form-group"><label>T° (°C)</label><input type="number" step="0.1" id="sv_temp"></div>
+<div class="form-group"><label>SatO2 (%)</label><input type="number" id="sv_sato2"></div>
+<div class="form-group"><label>Peso (kg)</label><input type="number" step="0.1" id="sv_peso"></div>
+<div class="form-group"><label>Talla (cm)</label><input type="number" id="sv_talla"></div>
+<div class="form-group"><label>IMC</label><input type="text" id="sv_imc" readonly></div>
+</div>
+</div>
+<div class="card">
+<div class="card-title"><span class="icon">🩺</span> Examen Físico por Sistemas</div>
+<div class="form-group full-width"><label>Estado General / Aspecto</label><textarea id="ef_general" rows="2" placeholder="Estado de conciencia, actitud, fascies, hidratación, palidez, ictericia..."></textarea></div>
+<div class="form-grid cols-2" style="margin-top:10px">
+<div class="form-group"><label>Cabeza y Cuello</label><textarea id="ef_cabeza" rows="2"></textarea></div>
+<div class="form-group"><label>Tórax / Cardiopulmonar</label><textarea id="ef_torax" rows="2"></textarea></div>
+<div class="form-group"><label>Abdomen</label><textarea id="ef_abdomen" rows="2"></textarea></div>
+<div class="form-group"><label>Extremidades / Musculoesquelético</label><textarea id="ef_extremidades" rows="2"></textarea></div>
+<div class="form-group"><label>Neurológico</label><textarea id="ef_neuro" rows="2"></textarea></div>
+<div class="form-group"><label>Piel / Tegumentos / Mucosas</label><textarea id="ef_piel" rows="2" placeholder="Úlceras por presión, lesiones tumorales, edema, etc."></textarea></div>
+</div>
+<div class="form-group full-width" style="margin-top:10px"><label>Otros hallazgos relevantes</label><textarea id="ef_otros" rows="2"></textarea></div>
+</div>
+</div>
+
+<!-- TAB: ESCALAS DE FUNCIONALIDAD -->
+<div class="tab-content" id="tab-escalas-func">
+<div class="alert-box alert-info">📊 Escalas de valoración funcional: evalúan la capacidad del paciente para realizar actividades de la vida diaria y su estado funcional global.</div>
+
+<!-- PPS -->
+<div class="card scale-card func">
+<div class="card-title"><span class="badge-func scale-badge">Funcional</span> Palliative Performance Scale (PPS v2)</div>
+<div class="form-group">
+<label>Seleccione el nivel que mejor describa al paciente</label>
+<div class="scale-options" id="pps-options"></div>
+</div>
+<div class="scale-result" id="pps-result" style="display:none">
+<div>PPS: <span class="score" id="pps-score">--</span>%</div>
+<div class="interpretation" id="pps-interp"></div>
+</div>
+</div>
+
+<!-- Karnofsky -->
+<div class="card scale-card func">
+<div class="card-title"><span class="badge-func scale-badge">Funcional</span> Escala de Karnofsky (KPS)</div>
+<div class="form-group">
+<label>Seleccione el nivel funcional</label>
+<div class="scale-options" id="kps-options"></div>
+</div>
+<div class="scale-result" id="kps-result" style="display:none">
+<div>Karnofsky: <span class="score" id="kps-score">--</span>%</div>
+<div class="interpretation" id="kps-interp"></div>
+</div>
+</div>
+
+<!-- ECOG -->
+<div class="card scale-card oncol">
+<div class="card-title"><span class="badge-oncol scale-badge">Oncológica</span> ECOG Performance Status</div>
+<div class="form-group">
+<label>Seleccione el estado funcional ECOG</label>
+<div class="scale-options" id="ecog-options"></div>
+</div>
+<div class="scale-result" id="ecog-result" style="display:none">
+<div>ECOG: <span class="score" id="ecog-score">--</span></div>
+<div class="interpretation" id="ecog-interp"></div>
+</div>
+</div>
+
+<!-- Barthel -->
+<div class="card scale-card nononcol">
+<div class="card-title"><span class="badge-nononcol scale-badge">No Oncológica</span> Índice de Barthel (Independencia funcional)</div>
+<div id="barthel-items"></div>
+<div class="scale-result" id="barthel-result">
+<div>Barthel: <span class="score" id="barthel-score">0</span>/100</div>
+<div class="interpretation" id="barthel-interp">Dependencia total</div>
+</div>
+</div>
+</div>
+
+<!-- TAB: ESAS -->
+<div class="tab-content" id="tab-escalas-sint">
+<div class="alert-box alert-info">🌡 Edmonton Symptom Assessment System (ESAS-r): Evalúa 10 síntomas frecuentes en cuidados paliativos en una escala de 0 (ausente) a 10 (peor posible).</div>
+<div class="card scale-card oncol">
+<div class="card-title"><span class="badge-oncol scale-badge">Oncológica/General</span> ESAS-r (Edmonton Symptom Assessment System - Revisado)</div>
+<div id="esas-items"></div>
+<div class="scale-result" id="esas-result">
+<div>Carga total de síntomas (ESAS-Total): <span class="score" id="esas-total">0</span>/100</div>
+<div class="interpretation" id="esas-interp">Sin síntomas</div>
+<div id="esas-breakdown" style="margin-top:10px;font-size:12px"></div>
+</div>
+</div>
+</div>
+
+<!-- TAB: DOLOR -->
+<div class="tab-content" id="tab-escalas-dolor">
+<div class="alert-box alert-danger">🔥 Evaluación integral del dolor: intensidad, tipo (nociceptivo/neuropático/mixto), características y componentes.</div>
+
+<!-- EVA -->
+<div class="card scale-card dolor">
+<div class="card-title"><span class="badge-dolor scale-badge">Dolor</span> Escala Visual Analógica (EVA/VAS)</div>
+<div class="form-grid cols-3">
+<div class="form-group">
+<label>EVA en reposo</label>
+<div class="eva-value" id="eva-rest-val" style="color:#27ae60">0</div>
+<input type="range" min="0" max="10" value="0" class="eva-slider" id="eva-rest" oninput="updateEVA('rest')">
+<div class="eva-labels"><span>0 - Sin dolor</span><span>10 - Peor dolor</span></div>
+</div>
+<div class="form-group">
+<label>EVA en movimiento</label>
+<div class="eva-value" id="eva-mov-val" style="color:#27ae60">0</div>
+<input type="range" min="0" max="10" value="0" class="eva-slider" id="eva-mov" oninput="updateEVA('mov')">
+<div class="eva-labels"><span>0 - Sin dolor</span><span>10 - Peor dolor</span></div>
+</div>
+<div class="form-group">
+<label>EVA irruptivo (pico máximo)</label>
+<div class="eva-value" id="eva-irr-val" style="color:#27ae60">0</div>
+<input type="range" min="0" max="10" value="0" class="eva-slider" id="eva-irr" oninput="updateEVA('irr')">
+<div class="eva-labels"><span>0 - Sin dolor</span><span>10 - Peor dolor</span></div>
+</div>
+</div>
+</div>
+
+<!-- Características del dolor -->
+<div class="card scale-card dolor">
+<div class="card-title"><span class="badge-dolor scale-badge">Dolor</span> Caracterización del Dolor</div>
+<div class="form-grid cols-3">
+<div class="form-group"><label>Localización principal</label><input type="text" id="dolor_loc" placeholder="Ej: Lumbar, abdominal difuso..."></div>
+<div class="form-group"><label>Irradiación</label><input type="text" id="dolor_irrad" placeholder="¿Hacia dónde se irradia?"></div>
+<div class="form-group"><label>Temporalidad</label>
+<select id="dolor_temp"><option>Continuo</option><option>Intermitente</option><option>Continuo con exacerbaciones</option><option>Incidental</option></select>
+</div>
+<div class="form-group"><label>Tipo de dolor predominante</label>
+<select id="dolor_tipo" onchange="updateDolorJustificacion()">
+<option value="nociceptivo_somatico">Nociceptivo somático</option>
+<option value="nociceptivo_visceral">Nociceptivo visceral</option>
+<option value="neuropatico">Neuropático</option>
+<option value="mixto">Mixto (nociceptivo + neuropático)</option>
+<option value="irruptivo">Dolor irruptivo oncológico</option>
+<option value="total">Dolor total</option>
+</select></div>
+<div class="form-group"><label>Factores que alivian</label><input type="text" id="dolor_alivia"></div>
+<div class="form-group"><label>Factores que empeoran</label><input type="text" id="dolor_empeora"></div>
+</div>
+<div class="form-group full-width" style="margin-top:10px"><label>Descripción cualitativa</label><textarea id="dolor_desc" rows="2" placeholder="Quemante, punzante, opresivo, cólico, lancinante, sordo, pulsátil..."></textarea></div>
+</div>
+
+<!-- DN4 -->
+<div class="card scale-card dolor">
+<div class="card-title"><span class="badge-dolor scale-badge">Dolor Neuropático</span> Cuestionario DN4 (Douleur Neuropathique 4)</div>
+<p style="font-size:12px;color:var(--text-light);margin-bottom:10px">Puntuación ≥ 4/10: Alta probabilidad de dolor neuropático (sensibilidad 82.9%, especificidad 89.9%)</p>
+<div id="dn4-items"></div>
+<div class="scale-result" id="dn4-result">
+<div>DN4: <span class="score" id="dn4-score">0</span>/10</div>
+<div class="interpretation" id="dn4-interp">Improbable dolor neuropático</div>
+</div>
+</div>
+</div>
+
+<!-- TAB: PRONÓSTICO -->
+<div class="tab-content" id="tab-escalas-prog">
+<div class="alert-box alert-info">📈 Escalas pronósticas: ayudan a estimar supervivencia y orientar la toma de decisiones clínicas.</div>
+
+<!-- PPI -->
+<div class="card scale-card prog">
+<div class="card-title"><span class="badge-prog scale-badge">Pronóstico</span> Palliative Prognostic Index (PPI)</div>
+<p style="font-size:12px;color:var(--text-light);margin-bottom:10px">Predice supervivencia en pacientes oncológicos en fase paliativa.</p>
+<div id="ppi-items"></div>
+<div class="scale-result" id="ppi-result">
+<div>PPI: <span class="score" id="ppi-score">0</span></div>
+<div class="interpretation" id="ppi-interp">Calcule completando los ítems</div>
+</div>
+</div>
+
+<!-- NECPAL -->
+<div class="card scale-card nononcol">
+<div class="card-title"><span class="badge-nononcol scale-badge">No Oncológica</span> Instrumento NECPAL CCOMS-ICO 3.1</div>
+<p style="font-size:12px;color:var(--text-light);margin-bottom:10px">Identifica pacientes con necesidades paliativas y enfermedad crónica avanzada (oncológica y no oncológica).</p>
+<div id="necpal-items"></div>
+<div class="scale-result" id="necpal-result">
+<div class="interpretation" id="necpal-interp">Complete los ítems para determinar NECPAL (+) o (-)</div>
+</div>
+</div>
+
+<!-- SPICT -->
+<div class="card scale-card nononcol">
+<div class="card-title"><span class="badge-nononcol scale-badge">No Oncológica</span> SPICT-ES (Supportive and Palliative Care Indicators Tool)</div>
+<p style="font-size:12px;color:var(--text-light);margin-bottom:10px">Indicadores generales de deterioro de salud y necesidades paliativas.</p>
+<div id="spict-items"></div>
+<div class="scale-result" id="spict-result">
+<div>Indicadores SPICT positivos: <span class="score" id="spict-score">0</span></div>
+<div class="interpretation" id="spict-interp">Evalúe indicadores</div>
+</div>
+</div>
+</div>
+
+<!-- TAB: OTRAS ESCALAS -->
+<div class="tab-content" id="tab-escalas-other">
+<!-- CAM -->
+<div class="card scale-card other">
+<div class="card-title"><span class="badge-other scale-badge">Delirium</span> CAM (Confusion Assessment Method)</div>
+<p style="font-size:12px;color:var(--text-light);margin-bottom:10px">Detección de delirium. Criterios 1 + 2 + (3 ó 4) = Delirium positivo.</p>
+<div id="cam-items"></div>
+<div class="scale-result" id="cam-result">
+<div class="interpretation" id="cam-interp">Complete los criterios CAM</div>
+</div>
+</div>
+
+<!-- Glasgow -->
+<div class="card scale-card other">
+<div class="card-title"><span class="badge-other scale-badge">Neurológica</span> Escala de Glasgow</div>
+<div id="glasgow-items"></div>
+<div class="scale-result" id="glasgow-result">
+<div>Glasgow: <span class="score" id="glasgow-score">15</span>/15</div>
+<div class="interpretation" id="glasgow-interp">Sin alteración</div>
+</div>
+</div>
+
+<!-- Norton -->
+<div class="card scale-card other">
+<div class="card-title"><span class="badge-other scale-badge">Úlceras</span> Escala de Norton (Riesgo de úlceras por presión)</div>
+<div id="norton-items"></div>
+<div class="scale-result" id="norton-result">
+<div>Norton: <span class="score" id="norton-score">20</span>/20</div>
+<div class="interpretation" id="norton-interp">Sin riesgo</div>
+</div>
+</div>
+
+<!-- IDC-Pal -->
+<div class="card scale-card other">
+<div class="card-title"><span class="badge-other scale-badge">Complejidad</span> IDC-Pal (Instrumento Diagnóstico de Complejidad en Cuidados Paliativos)</div>
+<p style="font-size:12px;color:var(--text-light);margin-bottom:10px">Clasifica la complejidad de la situación paliativa para orientar el nivel de atención.</p>
+<div id="idc-items"></div>
+<div class="scale-result" id="idc-result">
+<div class="interpretation" id="idc-interp">Complete los elementos de complejidad</div>
+</div>
+</div>
+</div>
+
+<!-- TAB: ANÁLISIS Y DIAGNÓSTICO -->
+<div class="tab-content" id="tab-dx">
+<div class="card">
+<div class="card-title"><span class="icon">🔍</span> Resumen de Escalas Aplicadas</div>
+<div id="resumen-escalas" style="font-size:13px">
+<p style="color:var(--text-light)">Las escalas se actualizan automáticamente desde las pestañas correspondientes.</p>
+</div>
+</div>
+<div class="card">
+<div class="card-title"><span class="icon">🧠</span> Análisis y Correlación Clínica</div>
+<div class="form-group full-width"><textarea id="analisis_clinico" rows="8" placeholder="Correlacione los hallazgos clínicos, resultados de escalas, tipo de dolor y estado funcional del paciente. Incluya la justificación clínica para las decisiones terapéuticas. Considere: &#10;- Pronóstico estimado según escalas (PPI, PPS, NECPAL)&#10;- Clasificación del dolor y escalón analgésico OMS requerido&#10;- Síntomas prioritarios según ESAS&#10;- Necesidad de rotación opioide&#10;- Complejidad según IDC-Pal&#10;- Necesidades psicosociales y espirituales"></textarea></div>
+</div>
+<div class="card">
+<div class="card-title"><span class="icon">📋</span> Diagnósticos (CIE-10)</div>
+<div id="dx-list">
+<div class="form-grid cols-2" style="margin-bottom:8px">
+<div class="form-group"><label>Dx Principal</label><input type="text" id="dx1" placeholder="Código CIE-10 - Descripción"></div>
+<div class="form-group"><label>Dx Relacionado 1</label><input type="text" id="dx2"></div>
+<div class="form-group"><label>Dx Relacionado 2</label><input type="text" id="dx3"></div>
+<div class="form-group"><label>Dx Relacionado 3</label><input type="text" id="dx4"></div>
+</div>
+</div>
+<div class="form-group" style="margin-top:10px"><label>Z51.5 - Cuidados paliativos</label>
+<select id="dx_z515"><option value="si">Incluir Z51.5</option><option value="no">No incluir</option></select>
+</div>
+</div>
+</div>
+
+<!-- TAB: PLAN DE MANEJO -->
+<div class="tab-content" id="tab-plan">
+<div class="alert-box alert-warning">💊 Plan de manejo farmacológico con justificación clínica y respaldo INVIMA. Cada medicamento prescrito genera automáticamente la correlación con la clínica del paciente.</div>
+
+<div class="card">
+<div class="card-title"><span class="icon">💊</span> Prescripción Farmacológica</div>
+<div class="med-selector" style="margin-bottom:16px">
+<input type="text" class="med-search" id="med-search" placeholder="🔍 Buscar medicamento (ej: morfina, fentanilo, gabapentina...)" oninput="filterMeds()" onfocus="filterMeds()">
+<div class="med-dropdown" id="med-dropdown"></div>
+</div>
+<div id="prescribed-meds"></div>
+</div>
+
+<div class="card">
+<div class="card-title"><span class="icon">📝</span> Plan No Farmacológico</div>
+<div class="form-group full-width"><textarea id="plan_no_farmaco" rows="4" placeholder="Medidas no farmacológicas: posición, fisioterapia, terapia ocupacional, intervención psicológica, acompañamiento espiritual, musicoterapia, aromaterapia, educación al cuidador..."></textarea></div>
+</div>
+
+<div class="card">
+<div class="card-title"><span class="icon">📋</span> Limitación del Esfuerzo Terapéutico</div>
+<div class="form-group full-width"><textarea id="let_doc" rows="3" placeholder="Documentar acuerdos sobre limitación de esfuerzo terapéutico: No RCP, no UCI, no VM, no medidas invasivas. Fundamentar según Ley 1733/2014 y Resolución 2665/2018..."></textarea></div>
+</div>
+
+<div class="card">
+<div class="card-title"><span class="icon">📅</span> Plan de Seguimiento</div>
+<div class="form-grid cols-3">
+<div class="form-group"><label>Próximo control</label><input type="date" id="prox_control"></div>
+<div class="form-group"><label>Modalidad</label>
+<select id="modalidad_control"><option>Presencial</option><option>Telemedicina</option><option>Visita domiciliaria</option><option>Según necesidad</option></select>
+</div>
+<div class="form-group"><label>Signos de alarma</label><input type="text" id="signos_alarma" placeholder="Disnea severa, sangrado, delirium agitado..."></div>
+</div>
+<div class="form-group full-width" style="margin-top:10px"><label>Instrucciones al paciente / cuidador</label><textarea id="instrucciones" rows="3" placeholder="Educación en manejo de medicamentos, reconocimiento de signos de alarma, contacto para urgencias, manejo de rescates..."></textarea></div>
+</div>
+
+<div class="card">
+<div class="card-title"><span class="icon">✍️</span> Firma del Profesional</div>
+<div class="form-grid cols-3">
+<div class="form-group"><label>Nombre del médico</label><input type="text" id="medico_nombre"></div>
+<div class="form-group"><label>Registro médico / RM</label><input type="text" id="medico_rm"></div>
+<div class="form-group"><label>Especialidad</label><input type="text" id="medico_esp" value="Medicina Paliativa"></div>
+</div>
+</div>
+</div>
+
+</div><!-- end container -->
+
+<script>
+// ==================== NAVIGATION ====================
+document.querySelectorAll('.nav-tab').forEach(tab => {
+  tab.addEventListener('click', () => {
+    document.querySelectorAll('.nav-tab').forEach(t => t.classList.remove('active'));
+    document.querySelectorAll('.tab-content').forEach(c => c.classList.remove('active'));
+    tab.classList.add('active');
+    document.getElementById(tab.dataset.tab).classList.add('active');
+    if(tab.dataset.tab === 'tab-dx') updateResumenEscalas();
+  });
+});
+
+// ==================== UTILITY ====================
+function calcEdad(){
+  const fn = document.getElementById('fecha_nac').value;
+  if(!fn) return;
+  const parts = fn.split('-');
+  if(parts.length !== 3) return;
+  const bd = new Date(parseInt(parts[0]), parseInt(parts[1])-1, parseInt(parts[2]));
+  if(isNaN(bd.getTime())) return;
+  const today = new Date();
+  let age = today.getFullYear() - bd.getFullYear();
+  const m = today.getMonth() - bd.getMonth();
+  if(m < 0 || (m === 0 && today.getDate() < bd.getDate())) age--;
+  if(age < 0) age = 0;
+  const edadEl = document.getElementById('edad');
+  edadEl.value = age + ' años';
+}
+function toggleOncologico(){
+  const t = document.getElementById('tipo_paciente').value;
+  document.getElementById('div_dx_oncol').style.display = t==='oncologico'?'flex':'none';
+}
+
+function updateEVA(type){
+  const val = document.getElementById('eva-'+type).value;
+  const el = document.getElementById('eva-'+type+'-val');
+  el.textContent = val;
+  const colors = ['#27ae60','#27ae60','#2ecc71','#f1c40f','#f1c40f','#e67e22','#e67e22','#e74c3c','#e74c3c','#c0392b','#8e0000'];
+  el.style.color = colors[val];
+  document.getElementById('eva-'+type).style.background = `linear-gradient(to right, #27ae60 0%, #f1c40f 50%, #c0392b 100%)`;
+}
+
+// ==================== SCALES DATA ====================
+const PPS_DATA = [
+  {v:100,d:"Deambula normalmente, sin evidencia de enfermedad. Actividad normal, trabajo completo. Ingesta normal. Consciente y orientado."},
+  {v:90,d:"Deambula normalmente. Alguna evidencia de enfermedad. Actividad normal con esfuerzo. Ingesta normal. Consciente y orientado."},
+  {v:80,d:"Deambula normalmente. Alguna evidencia de enfermedad. Actividad normal con esfuerzo. Ingesta normal o reducida. Consciente y orientado."},
+  {v:70,d:"Reducida. No puede realizar trabajo ni hobbies normales. Enfermedad significativa. Ingesta normal o reducida. Consciente y orientado."},
+  {v:60,d:"Reducida. Incapaz de hacer hobbies, pero hace tareas domésticas. Enfermedad significativa. Ingesta normal o reducida. Consciente: confusión ocasional."},
+  {v:50,d:"Principalmente sentado/acostado. Incapaz de cualquier trabajo. Enfermedad extensa. Ingesta reducida. Consciente: confusión ocasional o somnolencia."},
+  {v:40,d:"Principalmente en cama. Incapaz de la mayoría de actividades. Enfermedad extensa. Ingesta mínima. Somnoliento ± confusión."},
+  {v:30,d:"Totalmente en cama. Incapaz de cualquier actividad. Enfermedad extensa. Mínimos sorbos. Somnoliento ± confusión."},
+  {v:20,d:"Totalmente en cama. Incapaz de cualquier actividad. Enfermedad extensa. Solo cuidado de boca. Somnoliento. Solo capaz de mínima respuesta."},
+  {v:10,d:"Totalmente en cama. Incapaz de cualquier actividad. Enfermedad extensa. No ingesta. Inconsciente o apenas responde."},
+  {v:0,d:"Muerte"}
+];
+
+const KPS_DATA = [
+  {v:100,d:"Normal. Sin quejas, sin evidencia de enfermedad."},
+  {v:90,d:"Capaz de actividad normal; signos menores de enfermedad."},
+  {v:80,d:"Actividad normal con esfuerzo; algunos signos de enfermedad."},
+  {v:70,d:"Se cuida a sí mismo; incapaz de actividad normal o trabajo activo."},
+  {v:60,d:"Requiere asistencia ocasional pero es capaz de atender la mayoría de sus necesidades."},
+  {v:50,d:"Requiere asistencia considerable y cuidado médico frecuente."},
+  {v:40,d:"Discapacitado; requiere cuidado y asistencia especial."},
+  {v:30,d:"Severamente discapacitado; hospitalización indicada aunque no inminente la muerte."},
+  {v:20,d:"Muy enfermo; hospitalización necesaria; tratamiento activo de soporte necesario."},
+  {v:10,d:"Moribundo; proceso fatal progresando rápidamente."},
+  {v:0,d:"Muerte"}
+];
+
+const ECOG_DATA = [
+  {v:0,d:"Completamente activo, capaz de realizar todas sus actividades previas sin restricción."},
+  {v:1,d:"Restringido en actividad física extenuante pero ambulatorio y capaz de realizar trabajo ligero."},
+  {v:2,d:"Ambulatorio y capaz de autocuidado pero incapaz de realizar actividades laborales. En pie más del 50% del tiempo despierto."},
+  {v:3,d:"Capaz de autocuidado limitado; confinado a cama o silla más del 50% del tiempo despierto."},
+  {v:4,d:"Completamente discapacitado. No puede realizar autocuidado. Totalmente confinado a cama o silla."},
+  {v:5,d:"Muerte"}
+];
+
+const BARTHEL_ITEMS = [
+  {name:"Alimentación",opts:[{s:10,t:"Independiente"},{s:5,t:"Necesita ayuda"},{s:0,t:"Dependiente"}]},
+  {name:"Baño",opts:[{s:5,t:"Independiente"},{s:0,t:"Dependiente"}]},
+  {name:"Aseo personal",opts:[{s:5,t:"Independiente"},{s:0,t:"Dependiente"}]},
+  {name:"Vestido",opts:[{s:10,t:"Independiente"},{s:5,t:"Necesita ayuda"},{s:0,t:"Dependiente"}]},
+  {name:"Control de heces",opts:[{s:10,t:"Continente"},{s:5,t:"Accidente ocasional"},{s:0,t:"Incontinente"}]},
+  {name:"Control de orina",opts:[{s:10,t:"Continente"},{s:5,t:"Accidente ocasional"},{s:0,t:"Incontinente"}]},
+  {name:"Uso del inodoro",opts:[{s:10,t:"Independiente"},{s:5,t:"Necesita ayuda"},{s:0,t:"Dependiente"}]},
+  {name:"Traslado cama-silla",opts:[{s:15,t:"Independiente"},{s:10,t:"Mínima ayuda"},{s:5,t:"Gran ayuda"},{s:0,t:"Dependiente"}]},
+  {name:"Deambulación",opts:[{s:15,t:"Independiente"},{s:10,t:"Necesita ayuda"},{s:5,t:"Silla de ruedas"},{s:0,t:"Dependiente"}]},
+  {name:"Subir escalones",opts:[{s:10,t:"Independiente"},{s:5,t:"Necesita ayuda"},{s:0,t:"Dependiente"}]}
+];
+
+const ESAS_ITEMS = [
+  {id:"dolor",name:"Dolor",low:"Sin dolor",high:"Peor dolor posible"},
+  {id:"fatiga",name:"Cansancio/Fatiga",low:"Sin cansancio",high:"Peor cansancio"},
+  {id:"nausea",name:"Náusea",low:"Sin náusea",high:"Peor náusea"},
+  {id:"depresion",name:"Depresión",low:"Sin depresión",high:"Peor depresión"},
+  {id:"ansiedad",name:"Ansiedad",low:"Sin ansiedad",high:"Peor ansiedad"},
+  {id:"somnolencia",name:"Somnolencia",low:"Sin somnolencia",high:"Peor somnolencia"},
+  {id:"apetito",name:"Falta de apetito",low:"Buen apetito",high:"Sin apetito"},
+  {id:"bienestar",name:"Malestar general",low:"Bienestar",high:"Peor malestar"},
+  {id:"disnea",name:"Dificultad para respirar",low:"Sin disnea",high:"Peor disnea"},
+  {id:"otro",name:"Otro síntoma (especificar)",low:"Ausente",high:"Peor posible"}
+];
+
+const DN4_ITEMS = [
+  {cat:"Entrevista al paciente - ¿El dolor presenta alguna de estas características?",items:["Quemazón","Sensación de frío doloroso","Descargas eléctricas"]},
+  {cat:"¿Se asocia a alguno de los siguientes síntomas en la misma zona?",items:["Hormigueo","Pinchazos","Entumecimiento","Escozor/prurito"]},
+  {cat:"Examen del paciente - ¿Se evidencia en la exploración?",items:["Hipoestesia al tacto","Hipoestesia al pinchazo","El dolor se provoca o incrementa por el roce (alodinia)"]}
+];
+
+const PPI_ITEMS = [
+  {name:"PPS (Palliative Performance Scale)",opts:[{s:4,t:"PPS 10-20"},{s:2.5,t:"PPS 30-50"},{s:0,t:"PPS ≥ 60"}]},
+  {name:"Ingesta oral",opts:[{s:2.5,t:"Severamente reducida (sorbos)"},{s:1,t:"Moderadamente reducida"},{s:0,t:"Normal"}]},
+  {name:"Edema",opts:[{s:1,t:"Presente"},{s:0,t:"Ausente"}]},
+  {name:"Disnea en reposo",opts:[{s:3.5,t:"Presente"},{s:0,t:"Ausente"}]},
+  {name:"Delirium",opts:[{s:4,t:"Presente"},{s:0,t:"Ausente"}]}
+];
+
+const NECPAL_ITEMS = [
+  {q:"¿Le sorprendería que este paciente falleciera en los próximos 12 meses?",id:"necpal_sorpresa"},
+  {q:"¿Tiene el paciente demanda o necesidad de atención paliativa?",id:"necpal_demanda"},
+  {q:"¿Presenta indicadores clínicos de severidad y progresión? (declive funcional, nutricional, cognitivo)",id:"necpal_indicadores"},
+  {q:"¿Tiene criterios de enfermedad avanzada específicos de su patología?",id:"necpal_criterios"},
+  {q:"¿Ha tenido uso de recursos indicativos de gravedad? (2+ urgencias, 2+ ingresos en 6 meses)",id:"necpal_recursos"},
+  {q:"¿Presenta comorbilidad asociada?",id:"necpal_comorbilidad"}
+];
+
+const SPICT_ITEMS = [
+  "Ingreso hospitalario no planificado",
+  "Deterioro funcional o dependencia creciente",
+  "Necesidad creciente de cuidador o soporte",
+  "Pérdida de peso significativa en últimos meses",
+  "Síntomas persistentes a pesar de tratamiento óptimo",
+  "Paciente o familia solicitan cuidados paliativos o limitación de tratamiento",
+  "Indicadores específicos de enfermedad avanzada presentes"
+];
+
+const GLASGOW_ITEMS = [
+  {name:"Apertura ocular",opts:[{s:4,t:"Espontánea"},{s:3,t:"Al estímulo verbal"},{s:2,t:"Al dolor"},{s:1,t:"No responde"}]},
+  {name:"Respuesta verbal",opts:[{s:5,t:"Orientada"},{s:4,t:"Confusa"},{s:3,t:"Palabras inapropiadas"},{s:2,t:"Sonidos incomprensibles"},{s:1,t:"No responde"}]},
+  {name:"Respuesta motora",opts:[{s:6,t:"Obedece órdenes"},{s:5,t:"Localiza dolor"},{s:4,t:"Retira al dolor"},{s:3,t:"Flexión anormal"},{s:2,t:"Extensión"},{s:1,t:"No responde"}]}
+];
+
+const NORTON_ITEMS = [
+  {name:"Estado físico general",opts:[{s:4,t:"Bueno"},{s:3,t:"Regular"},{s:2,t:"Malo"},{s:1,t:"Muy malo"}]},
+  {name:"Estado mental",opts:[{s:4,t:"Alerta"},{s:3,t:"Apático"},{s:2,t:"Confuso"},{s:1,t:"Estuporoso"}]},
+  {name:"Actividad",opts:[{s:4,t:"Deambula"},{s:3,t:"Deambula con ayuda"},{s:2,t:"Sentado"},{s:1,t:"Encamado"}]},
+  {name:"Movilidad",opts:[{s:4,t:"Total"},{s:3,t:"Disminuida"},{s:2,t:"Muy limitada"},{s:1,t:"Inmóvil"}]},
+  {name:"Incontinencia",opts:[{s:4,t:"Ninguna"},{s:3,t:"Ocasional"},{s:2,t:"Urinaria/Fecal"},{s:1,t:"Urinaria y fecal"}]}
+];
+
+const CAM_ITEMS = [
+  {name:"1. Inicio agudo y curso fluctuante",desc:"¿Hubo un cambio agudo en el estado mental respecto al basal? ¿La conducta fluctúa durante el día?"},
+  {name:"2. Inatención",desc:"¿El paciente tiene dificultad para mantener la atención? ¿Se distrae fácilmente?"},
+  {name:"3. Pensamiento desorganizado",desc:"¿El pensamiento es incoherente? ¿Conversación errática, ideas ilógicas?"},
+  {name:"4. Nivel de conciencia alterado",desc:"¿El paciente está hiperalerta, letárgico, estuporoso o en coma?"}
+];
+
+const IDC_ITEMS = [
+  {cat:"Elementos de complejidad dependientes del paciente",items:["Edad pediátrica o adolescente","Situación de últimos días/agonía compleja","Síntomas de difícil control (dolor refractario, disnea severa)","Delirium","Síntomas psicológicos severos (angustia existencial)","Dilemas éticos/decisiones complejas sobre LET","Riesgo de duelo patológico"]},
+  {cat:"Elementos dependientes de la familia/entorno",items:["Claudicación del cuidador","Familia disfuncional","Ausencia de soporte familiar/cuidador","Conspiración del silencio","Menores o dependientes a cargo"]},
+  {cat:"Elementos dependientes de la organización",items:["Dificultad en coordinación entre niveles asistenciales","Necesidad de intervención urgente paliativa","Necesidad de equipamiento especial"]}
+];
+
+// ==================== MEDICATION DATABASE ====================
+const MEDS_DB = [
+  // OPIOIDES DÉBILES
+  {id:"tramadol",name:"Tramadol",cat:"Opioide débil",grupo:"Escalón 2 OMS",
+   atc:"N02AX02",invima:"Múltiples registros INVIMA vigentes",
+   presentaciones:"Cápsulas 50mg, Gotas 100mg/mL, Ampolla 50mg/mL, Tab retard 100/150/200mg",
+   indicacion_invima:"Tratamiento del dolor de intensidad moderada a severa.",
+   dosis_usual:"50-100mg c/6-8h VO. Máx 400mg/día. Gotas: 20-40 gotas c/6-8h.",
+   justificacion_tipos:{
+     nociceptivo_somatico:"Tramadol está indicado como opioide de segundo escalón OMS para dolor nociceptivo somático moderado (EVA 4-6) que no responde adecuadamente a analgésicos no opioides. Su mecanismo dual (agonismo µ débil + inhibición de recaptación de serotonina y noradrenalina) proporciona analgesia complementaria. Registro INVIMA vigente para dolor moderado a severo.",
+     nociceptivo_visceral:"Tramadol indicado para dolor visceral moderado por su acción central como agonista opioide µ parcial. El componente monoaminérgico contribuye a la modulación del dolor visceral. Considerar asociación con antiespasmódicos si componente cólico.",
+     neuropatico:"Tramadol presenta ventaja en dolor neuropático sobre otros opioides débiles por su acción dual: el efecto inhibidor de la recaptación de serotonina y noradrenalina potencia la analgesia en dolor neuropático. Se recomienda asociar a coadyuvante anticonvulsivante o antidepresivo.",
+     mixto:"Tramadol como opioide de segundo escalón es especialmente útil en dolor mixto por su doble mecanismo de acción: componente opioide para dolor nociceptivo y componente monoaminérgico para el componente neuropático.",
+     irruptivo:"No es la primera línea para dolor irruptivo por su tiempo de inicio lento. Considerar formulación de liberación inmediata como rescate en pacientes con dolor basal controlado con segundo escalón.",
+     total:"Como parte del manejo multimodal del dolor total, tramadol contribuye al componente físico del dolor. Debe complementarse con intervenciones psicosociales y espirituales."
+   },precauciones:"Contraindicado con IMAO. Riesgo de síndrome serotoninérgico con ISRS/IRSN. Reducir dosis en insuficiencia renal (TFG <30mL/min). Puede reducir umbral convulsivo."},
+
+  {id:"codeina",name:"Codeína",cat:"Opioide débil",grupo:"Escalón 2 OMS",
+   atc:"N02AA59",invima:"Registros INVIMA vigentes (combinaciones con acetaminofén)",
+   presentaciones:"Tabletas Codeína 30mg + Acetaminofén 325mg",
+   indicacion_invima:"Alivio del dolor leve a moderadamente severo.",
+   dosis_usual:"30-60mg c/4-6h VO. Máx 240mg/día de codeína.",
+   justificacion_tipos:{
+     nociceptivo_somatico:"Codeína es un profármaco que se metaboliza a morfina vía CYP2D6. Indicado en dolor nociceptivo somático leve a moderado como segundo escalón OMS. La combinación con acetaminofén proporciona analgesia multimodal sinérgica.",
+     nociceptivo_visceral:"Indicado para dolor visceral leve a moderado. La asociación con acetaminofén mejora eficacia analgésica. Precaución en obstrucción intestinal por efecto anticolinérgico.",
+     neuropatico:"Eficacia limitada como monoterapia en dolor neuropático. Se recomienda como parte de estrategia multimodal asociado a coadyuvantes.",
+     mixto:"Útil en dolor mixto leve a moderado como parte de terapia combinada. La asociación con acetaminofén cubre el componente nociceptivo.",
+     irruptivo:"Puede utilizarse como rescate en dolor irruptivo leve cuando el dolor basal está controlado con primer escalón.",
+     total:"Componente farmacológico en manejo integral del dolor total leve a moderado."
+   },precauciones:"Metabolismo dependiente de CYP2D6 (metabolizadores lentos: ineficaz; ultrarrápidos: riesgo de toxicidad). Dosis máxima de acetaminofén 4g/día combinado."},
+
+  {id:"hidrocodona",name:"Hidrocodona + Acetaminofén",cat:"Opioide débil-moderado",grupo:"Escalón 2 OMS",
+   atc:"N02BE71",invima:"INVIMA 2021M-0020449 (Vigente). Exp. 20195416.",
+   presentaciones:"Tabletas Hidrocodona 5mg / Acetaminofén 325mg (Genfar). Caja x10, x30, x100, x150 tabletas.",
+   indicacion_invima:"ACTA NO. 07 DE 2018 SEM NUMERAL 3.1.4.1 TRATAMIENTO DEL DOLOR MODERADO A MODERADAMENTE SEVERO. Registro sanitario INVIMA 2021M-0020449, estado: Vigente. Fabricar y Vender. Franja: Ninguna. Venta con fórmula facultativa.",
+   dosis_usual:"5-10mg de hidrocodona c/4-6h VO. Máx 60mg/día de hidrocodona. No exceder 4g/día de acetaminofén.",
+   justificacion_tipos:{
+     nociceptivo_somatico:"Hidrocodona + Acetaminofén con Registro INVIMA 2021M-0020449 vigente, indicado para tratamiento del dolor moderado a moderadamente severo. La hidrocodona actúa como agonista opioide µ con potencia intermedia entre codeína y morfina. La combinación con acetaminofén 325mg proporciona analgesia multimodal. Clasificación ATC N02BE71. Apropiado para dolor óseo, muscular y articular moderado en paciente paliativo.",
+     nociceptivo_visceral:"Indicado según registro INVIMA vigente para dolor moderado a moderadamente severo. La hidrocodona proporciona analgesia visceral a través del agonismo µ central. La asociación con acetaminofén potencia la eficacia. Precaución: puede enmascarar diagnóstico de condiciones abdominales agudas según ficha técnica INVIMA.",
+     neuropatico:"Aunque la indicación INVIMA es dolor moderado a moderadamente severo sin especificación de tipo, la eficacia opioide en dolor neuropático es moderada como monoterapia. Se recomienda asociar a coadyuvante anticonvulsivante (gabapentina/pregabalina) o antidepresivo dual (duloxetina/amitriptilina).",
+     mixto:"Hidrocodona + Acetaminofén indicado INVIMA para dolor moderado a moderadamente severo. En dolor mixto, el componente opioide aborda el dolor nociceptivo y el acetaminofén aporta analgesia periférica. Complementar con coadyuvantes para el componente neuropático.",
+     irruptivo:"Puede utilizarse como analgesia de rescate para dolor irruptivo moderado. Inicio de acción 20-30 minutos VO. Documentar frecuencia de rescates para evaluar necesidad de rotación a tercer escalón.",
+     total:"Componente farmacológico del abordaje integral del dolor total moderado. Registro INVIMA vigente respalda su uso. Complementar obligatoriamente con medidas no farmacológicas e intervención psicosocial-espiritual."
+   },precauciones:"Según ficha INVIMA: contraindicado en hipersensibilidad previa a opioides (sensibilidad cruzada). Riesgo de falla hepática por acetaminofén (no exceder 4g/día). Depresión respiratoria dosis-dependiente. Precaución en ancianos, insuficiencia hepática/renal, hipotiroidismo, enfermedad de Addison. No usar con IMAO. Puede causar confusión y sobresedación en ancianos. Medicamento de control especial."},
+
+  // OPIOIDES FUERTES
+  {id:"morfina",name:"Morfina",cat:"Opioide fuerte",grupo:"Escalón 3 OMS",
+   atc:"N02AA01",invima:"Múltiples registros INVIMA vigentes (oral, SC, IV). Medicamento esencial.",
+   presentaciones:"Tab 15/30mg, Solución oral 3mg/mL, Ampolla 10mg/mL. Liberación prolongada: Tab 15/30/60/100mg.",
+   indicacion_invima:"Dolor severo (oncológico y no oncológico). Disnea refractaria en enfermedad avanzada.",
+   dosis_usual:"Inicio: 5-10mg VO c/4h o 2.5-5mg SC c/4h. Titular según respuesta. No tiene techo analgésico.",
+   justificacion_tipos:{
+     nociceptivo_somatico:"Morfina es el opioide de referencia del tercer escalón OMS, gold standard en dolor severo. Agonista µ puro sin techo analgésico. Indicación INVIMA para dolor severo. En dolor óseo metastásico severo, considerar asociación con AINE y bifosfonatos. Titular dosis según respuesta analgésica y efectos adversos.",
+     nociceptivo_visceral:"Morfina como agonista µ puro es primera línea para dolor visceral severo (compresión tumoral, hepatomegalia, obstrucción). En dolor cólico visceral, considerar asociar butilbromuro de hioscina. Titular hasta control adecuado del dolor.",
+     neuropatico:"Morfina tiene eficacia moderada en dolor neuropático puro. Se recomienda como tercer escalón en combinación obligada con coadyuvantes: gabapentina/pregabalina (primera línea) y/o amitriptilina/duloxetina. La dosis requerida puede ser mayor que en dolor nociceptivo.",
+     mixto:"En dolor mixto severo, morfina como pilar del tercer escalón asociada a coadyuvantes para el componente neuropático. Ajustar dosis según el componente predominante. Registro INVIMA respalda uso en dolor severo.",
+     irruptivo:"Morfina de liberación inmediata (oral o SC) es primera línea para rescate de dolor irruptivo oncológico. Dosis de rescate: 10-15% de la dosis diaria total. Vía SC: inicio en 15-20 min. Si >3 rescates/día, ajustar dosis basal.",
+     total:"Morfina como eje farmacológico del manejo del dolor total severo. El alivio del sufrimiento físico es condición necesaria para abordar las dimensiones psicológica, social y espiritual del dolor total (Cicely Saunders). Marco legal: Ley 1733/2014 garantiza acceso a opioides en cuidados paliativos."
+   },precauciones:"Titular desde dosis bajas. Prescribir laxante profiláctico (estreñimiento). Antiemético primeros 5-7 días. Precaución en insuficiencia renal (acumulación de M6G). Reducir dosis en ancianos. Vigilar sedación y depresión respiratoria."},
+
+  {id:"hidromorfona",name:"Hidromorfona",cat:"Opioide fuerte",grupo:"Escalón 3 OMS",
+   atc:"N02AA03",invima:"Registros INVIMA vigentes. Medicamento de control especial.",
+   presentaciones:"Cápsulas lib. prolongada (OROS) 4/8/16/32mg. Ampolla 2mg/mL.",
+   indicacion_invima:"Dolor severo que requiere analgesia opioide continua durante un periodo prolongado.",
+   dosis_usual:"Inicio: 4mg VO c/24h (OROS). Rotación desde morfina: ratio 5:1 (morfina:hidromorfona).",
+   justificacion_tipos:{
+     nociceptivo_somatico:"Hidromorfona es un opioide semisintético 5-7 veces más potente que la morfina. Indicada en dolor severo que requiere analgesia opioide continua. Formulación OROS permite administración c/24h con liberación controlada. Ventaja en dolor óseo severo por alta potencia y perfil farmacocinético estable.",
+     nociceptivo_visceral:"Indicada para dolor visceral severo. Ventaja sobre morfina en insuficiencia renal por menor acumulación de metabolitos activos. Formulación de liberación prolongada proporciona analgesia sostenida.",
+     neuropatico:"Como otros opioides fuertes, eficacia parcial en dolor neuropático. Asociar obligatoriamente con coadyuvantes. Puede ser alternativa en rotación opioide cuando morfina es insuficiente.",
+     mixto:"Hidromorfona como alternativa al tercer escalón en dolor mixto severo, especialmente útil en rotación opioide por tolerancia a morfina o efectos adversos. Asociar con coadyuvantes para componente neuropático.",
+     irruptivo:"La formulación OROS no es apropiada para rescate. Para dolor irruptivo en pacientes con hidromorfona basal, usar morfina de liberación inmediata como rescate.",
+     total:"Componente opioide del manejo integral del dolor total severo. Especialmente útil cuando la morfina genera efectos adversos intolerables."
+   },precauciones:"No triturar cápsulas OROS. Rotación con reducción 25-50% de dosis equianalgésica. Precaución en hepatopatía. Menor riesgo de prurito e histaminoliberación que morfina."},
+
+  {id:"oxicodona",name:"Oxicodona",cat:"Opioide fuerte",grupo:"Escalón 3 OMS",
+   atc:"N02AA05",invima:"Registros INVIMA vigentes. Tab liberación controlada.",
+   presentaciones:"Tab lib. controlada 10/20/40/80mg. Cápsulas lib. inmediata 5/10/20mg.",
+   indicacion_invima:"Dolor severo que solo puede ser tratado adecuadamente con analgésicos opioides.",
+   dosis_usual:"Inicio: 10mg c/12h VO (lib. controlada). Ratio equianalgésica con morfina VO: 1.5:1.",
+   justificacion_tipos:{
+     nociceptivo_somatico:"Oxicodona con registro INVIMA para dolor severo. Agonista µ y κ, con posible ventaja en dolor somático profundo y óseo por su acción sobre receptores κ. Formulación c/12h facilita adherencia.",
+     nociceptivo_visceral:"Oxicodona presenta ventaja teórica en dolor visceral por su acción agonista κ además de µ. Estudios sugieren mejor respuesta en dolor visceral comparada con otros opioides del tercer escalón.",
+     neuropatico:"Oxicodona ha mostrado evidencia en dolor neuropático, posiblemente por su acción sobre receptores κ. Considerar como opción en rotación opioide cuando el componente neuropático es predominante, siempre asociada a coadyuvantes.",
+     mixto:"Excelente opción para dolor mixto severo por su perfil receptor dual (µ y κ). La acción κ puede beneficiar especialmente el componente visceral y neuropático del dolor mixto.",
+     irruptivo:"Formulación de liberación inmediata (cápsulas 5-10mg) útil para rescate. Dosis rescate: 10-15% de dosis diaria total.",
+     total:"Componente farmacológico del dolor total severo. Formulación de lib. controlada facilita adherencia y mejora calidad de vida."
+   },precauciones:"No triturar tabletas de lib. controlada (riesgo de sobredosis fatal). Metabolismo CYP3A4 y CYP2D6. Precaución con inhibidores de CYP3A4."},
+
+  {id:"fentanilo_td",name:"Fentanilo transdérmico",cat:"Opioide fuerte",grupo:"Escalón 3 OMS",
+   atc:"N02AB03",invima:"Registros INVIMA vigentes. Parches 12/25/50/75/100 µg/h. Control especial.",
+   presentaciones:"Parches transdérmicos 12, 25, 50, 75, 100 µg/h. Cambio c/72h.",
+   indicacion_invima:"Dolor crónico severo que requiere analgesia opioide continua. Dolor oncológico.",
+   dosis_usual:"Inicio: 12-25 µg/h c/72h (pacientes no expuestos a opioides iniciar con 12 µg/h). Rotación desde morfina oral: dividir dosis diaria total entre 2.",
+   justificacion_tipos:{
+     nociceptivo_somatico:"Fentanilo transdérmico con registro INVIMA para dolor crónico severo. Agonista µ puro, 80-100 veces más potente que morfina. Vía transdérmica ideal para pacientes con dificultad para deglución, náuseas refractarias, obstrucción intestinal, o mala absorción oral. Liberación sostenida c/72h.",
+     nociceptivo_visceral:"Indicado en dolor visceral severo crónico, especialmente ventajoso en obstrucción intestinal maligna (no requiere vía oral). Menor estreñimiento que morfina por vía transdérmica. Analgesia estable y sostenida.",
+     neuropatico:"Eficacia comparable a otros opioides en dolor neuropático. La vía transdérmica ofrece niveles plasmáticos estables que benefician el control del dolor neuropático continuo. Asociar con coadyuvantes.",
+     mixto:"Fentanilo TD como opción en dolor mixto severo crónico, especialmente en pacientes con intolerancia a la vía oral, obstrucción intestinal, o preferencia por menor frecuencia de administración.",
+     irruptivo:"Los parches transdérmicos NO son adecuados para dolor irruptivo. Para rescate: fentanilo sublingual/transmucoso o morfina de liberación inmediata. Dosis de rescate fentanilo: calcular según dosis basal.",
+     total:"Fentanilo TD mejora calidad de vida al reducir frecuencia de administración (c/72h), menor estreñimiento que morfina oral. Facilita manejo ambulatorio y domiciliario del dolor severo."
+   },precauciones:"No cortar parches. No exponer a calor externo (fiebre, mantas térmicas). Inicio de acción lento (12-24h): requiere analgesia puente. No usar en dolor agudo. Retirar gradualmente. Pacientes caquécticos: absorción errática."},
+
+  {id:"fentanilo_sl",name:"Fentanilo sublingual/transmucoso",cat:"Opioide fuerte",grupo:"Escalón 3 OMS - Rescate",
+   atc:"N02AB03",invima:"Registros INVIMA para formulaciones transmucosas.",
+   presentaciones:"Comprimidos sublinguales 100/200/400/600/800 µg.",
+   indicacion_invima:"Dolor irruptivo oncológico en pacientes adultos que ya reciben terapia de mantenimiento con opioides.",
+   dosis_usual:"Iniciar con 100 µg. Titular según respuesta. Máx 4 episodios/día con mínimo 2h entre dosis.",
+   justificacion_tipos:{
+     nociceptivo_somatico:"Fentanilo sublingual/transmucoso con indicación INVIMA específica para dolor irruptivo oncológico. Inicio de acción rápido (5-10 min por vía sublingual) lo hace ideal para crisis de dolor irruptivo. Solo en pacientes ya en tercer escalón con opioides basales.",
+     nociceptivo_visceral:"Indicado para episodios irruptivos de dolor visceral en pacientes con analgesia basal opioide. La rápida absorción transmucosa permite manejo eficaz de crisis viscerales agudas.",
+     neuropatico:"Útil para exacerbaciones agudas de dolor neuropático irruptivo, especialmente dolor lancinante paroxístico. Asociar al manejo basal con coadyuvantes.",
+     mixto:"Fentanilo de acción rápida como rescate en dolor irruptivo mixto. Cada episodio debe documentarse para ajuste de dosis basal.",
+     irruptivo:"INDICACIÓN PRINCIPAL. Fentanilo sublingual es primera línea para dolor irruptivo oncológico por su rápido inicio de acción. Registro INVIMA específico para esta indicación. Titular desde dosis mínima. No hay correlación entre dosis basal y dosis de rescate efectiva: titular individualmente.",
+     total:"Componente esencial para manejo del dolor irruptivo dentro del abordaje integral del dolor total."
+   },precauciones:"Solo en pacientes tolerantes a opioides (≥60mg/día morfina oral equivalente o equivalente). No usar en pacientes naive. Titular individualmente. Riesgo de depresión respiratoria fatal en no tolerantes."},
+
+  {id:"metadona",name:"Metadona",cat:"Opioide fuerte",grupo:"Escalón 3 OMS",
+   atc:"N02AC52",invima:"Registros INVIMA vigentes. Control especial.",
+   presentaciones:"Tabletas 5/10/40mg. Solución oral.",
+   indicacion_invima:"Dolor severo. Tratamiento de desintoxicación y mantenimiento de dependencia a opiáceos.",
+   dosis_usual:"Inicio dolor: 2.5-5mg c/8-12h. Rotación compleja: requiere tablas de conversión variables según dosis previa.",
+   justificacion_tipos:{
+     nociceptivo_somatico:"Metadona con registro INVIMA para dolor severo. Agonista µ con propiedades únicas: antagonismo NMDA (previene tolerancia) e inhibición de recaptación de serotonina y noradrenalina. Vida media larga pero variable. Especialmente útil en dolor refractario a otros opioides.",
+     nociceptivo_visceral:"Metadona efectiva en dolor visceral severo refractario. La acción antagonista NMDA puede ser particularmente beneficiosa en estados de sensibilización central asociados a dolor visceral crónico.",
+     neuropatico:"Metadona presenta ventaja específica en dolor neuropático por su doble mecanismo: agonismo µ + antagonismo NMDA. El bloqueo NMDA contrarresta mecanismos de sensibilización central y wind-up implicados en dolor neuropático. Considerar como opción preferente en rotación opioide cuando predomina componente neuropático.",
+     mixto:"Metadona es opción particularmente útil en dolor mixto severo por su perfil farmacológico triple: agonismo µ (componente nociceptivo), antagonismo NMDA (sensibilización central y neuropático), inhibición recaptación monoaminas (modulación descendente del dolor).",
+     irruptivo:"No adecuada para rescate por vida media larga y variable. Para rescates usar morfina de liberación inmediata o fentanilo transmucoso.",
+     total:"La metadona, por su perfil farmacológico único, es especialmente valiosa en dolor total complejo refractario a otros opioides."
+   },precauciones:"PRESCRIPCIÓN POR ESPECIALISTA. Vida media larga e impredecible (15-60h): riesgo de acumulación. Rotación compleja con tablas variables. Prolonga QTc: ECG basal y monitoreo. Múltiples interacciones por CYP3A4, 2D6, 2B6."},
+
+  {id:"buprenorfina",name:"Buprenorfina transdérmica",cat:"Opioide fuerte",grupo:"Escalón 3 OMS",
+   atc:"N02AE01",invima:"INVIMA 2025M-0021898. Exp. 20154557. Parche 35 µg/h (20mg buprenorfina). Estado: Pérdida Fuerza Ejec. Fabricante: Hexal AG (Alemania). Importador: Novartis/Sandoz.",
+   presentaciones:"Parche transdérmico 35 µg/h. Caja x 5 sachets. Sistema transdérmico DD. Cambio c/96h (cada 4 días) o c/72h según presentación.",
+   indicacion_invima:"DOLOR ONCOLÓGICO MODERADO A SEVERO Y DOLOR SEVERO QUE NO RESPONDA A LOS ANALGESICOS NO OPIOIDES. BUPRENORFINA NO ES ADECUADO PARA EL TRATAMIENTO DEL DOLOR AGUDO. Registro INVIMA 2025M-0021898. Franja Verde-Violeta. Clasificación ATC N02AE01 - Opioides, Derivados de la Oripavina. Medicamento esencial y de control especial.",
+   dosis_usual:"Parche 35 µg/h c/72-96h. En rotación desde morfina: considerar techo terapéutico por agonismo parcial µ.",
+   justificacion_tipos:{
+     nociceptivo_somatico:"Buprenorfina transdérmica con registro INVIMA 2025M-0021898 (Exp. 20154557) para dolor oncológico moderado a severo y dolor severo que no responda a analgésicos no opioides. Agonista parcial µ y antagonista κ con potencia 25-50 veces mayor que morfina. Ventaja: menor depresión respiratoria por efecto techo. Parche transdérmico permite analgesia sostenida sin vía oral.",
+     nociceptivo_visceral:"Indicación INVIMA para dolor severo que no responde a analgésicos no opioides. Buprenorfina TD útil en dolor visceral moderado a severo crónico. Menor estreñimiento que agonistas puros. Precaución: el efecto techo puede limitar eficacia en dolor visceral muy severo.",
+     neuropatico:"Buprenorfina tiene acción antihiperalgésica por su perfil receptor (agonista parcial µ, antagonista κ, agonista ORL-1). Puede ser ventajosa en dolor neuropático al modular múltiples vías del dolor. Asociar a coadyuvantes.",
+     mixto:"Buprenorfina TD como alternativa en dolor mixto moderado a severo por su perfil receptor amplio. La acción sobre receptores ORL-1 y κ complementa la analgesia µ. Indicación INVIMA respalda su uso en dolor oncológico y dolor severo refractario a no opioides.",
+     irruptivo:"Parche transdérmico NO es para dolor irruptivo. Para rescates en pacientes con buprenorfina basal, considerar buprenorfina sublingual o, en dolor severo, valorar compatibilidad con agonistas puros.",
+     total:"Buprenorfina TD como opción en dolor total moderado a severo. Ventajas: menor depresión respiratoria, menor estreñimiento, vía transdérmica (no requiere deglución). Según ficha INVIMA: no adecuado para dolor agudo."
+   },precauciones:"Según ficha INVIMA: Contraindicado en dependencia a opioides, tratamiento de abstinencia, deterioro grave de función respiratoria, uso de IMAO (o dentro de 2 semanas), miastenia gravis, delirium tremens, embarazo. Precaución con fiebre/calor externo (aumenta absorción). Agonista parcial: puede precipitar abstinencia al cambiar desde agonistas puros. No en menores de 18 años. Metabolismo hepático: precaución en hepatopatía."},
+
+  {id:"tapentadol",name:"Tapentadol",cat:"Opioide fuerte",grupo:"Escalón 3 OMS",
+   atc:"N02AX06",invima:"Registros INVIMA vigentes. Control especial.",
+   presentaciones:"Tab lib. prolongada 50/100/150/200/250mg.",
+   indicacion_invima:"Dolor severo crónico en adultos que solo puede ser manejado adecuadamente con analgésico opioide.",
+   dosis_usual:"Inicio: 50mg c/12h. Titular según respuesta. Máx 500mg/día.",
+   justificacion_tipos:{
+     nociceptivo_somatico:"Tapentadol con registro INVIMA para dolor severo crónico. Agonista µ + inhibidor de recaptación de noradrenalina (MOR-NRI). En dolor nociceptivo somático severo crónico, el componente µ proporciona analgesia central efectiva con menor incidencia de efectos adversos gastrointestinales que morfina.",
+     nociceptivo_visceral:"Indicado para dolor visceral severo crónico. El mecanismo dual MOR-NRI ofrece analgesia a través de dos vías complementarias. Menor estreñimiento que opioides puros.",
+     neuropatico:"Tapentadol presenta VENTAJA ESPECÍFICA en dolor neuropático por su potente inhibición de la recaptación de noradrenalina, que activa la vía inhibitoria descendente noradrenérgica del dolor. Estudios clínicos han demostrado eficacia en neuropatía diabética y dolor neuropático oncológico. Puede considerarse como primera opción de tercer escalón cuando predomina componente neuropático.",
+     mixto:"OPCIÓN PREFERENTE en dolor mixto severo crónico. El doble mecanismo MOR-NRI aborda simultáneamente el componente nociceptivo (agonismo µ) y neuropático (inhibición recaptación NA) con una sola molécula. Menor necesidad de coadyuvantes aunque se pueden asociar.",
+     irruptivo:"Formulación de liberación prolongada no es adecuada para rescate. Para dolor irruptivo en pacientes con tapentadol basal, usar opioides de liberación inmediata.",
+     total:"Tapentadol como opción farmacológica en dolor total severo crónico. Mejor tolerabilidad gastrointestinal (menor náusea, estreñimiento) mejora calidad de vida."
+   },precauciones:"No triturar tab. lib. prolongada. Evitar con IMAO. Menor interacción con CYP450 que tramadol. Riesgo de síndrome serotoninérgico si se asocia a serotoninérgicos. Precaución en insuficiencia hepática severa."},
+
+  // ADYUVANTES
+  {id:"gabapentina",name:"Gabapentina",cat:"Coadyuvante anticonvulsivante",grupo:"Dolor neuropático - 1ª línea",
+   atc:"N03AX12",invima:"Múltiples registros INVIMA vigentes.",
+   presentaciones:"Cápsulas 300/400mg. Tabletas 600/800mg.",
+   indicacion_invima:"Dolor neuropático periférico. Epilepsia.",
+   dosis_usual:"Inicio: 300mg/noche. Titular: 300mg c/3 días. Dosis terapéutica: 900-3600mg/día en 3 tomas.",
+   justificacion_tipos:{
+     nociceptivo_somatico:"No es primera línea para dolor nociceptivo somático puro. Puede contribuir como coadyuvante si existe componente de sensibilización central.",
+     neuropatico:"Gabapentina es PRIMERA LÍNEA para dolor neuropático en cuidados paliativos. Bloquea subunidad α2δ de canales de calcio voltaje-dependientes, reduciendo la liberación de neurotransmisores excitatorios. Registro INVIMA para dolor neuropático periférico. Evidencia sólida en neuralgia postherpética, neuropatía diabética y dolor neuropático oncológico. Titular gradualmente desde 300mg/noche.",
+     mixto:"Coadyuvante esencial en dolor mixto para abordar el componente neuropático. Asociar a opioide del escalón correspondiente. Titular gradualmente para minimizar somnolencia.",
+     total:"Componente coadyuvante del manejo multimodal del dolor total con componente neuropático."
+   },precauciones:"Titular lentamente (reduce somnolencia/mareo). Ajustar en insuficiencia renal. No suspender abruptamente. Somnolencia puede ser ventajosa si insomnio asociado."},
+
+  {id:"pregabalina",name:"Pregabalina",cat:"Coadyuvante anticonvulsivante",grupo:"Dolor neuropático - 1ª línea",
+   atc:"N03AX16",invima:"Registros INVIMA vigentes.",
+   presentaciones:"Cápsulas 25/50/75/150/300mg.",
+   indicacion_invima:"Dolor neuropático periférico y central. Trastorno de ansiedad generalizada. Epilepsia.",
+   dosis_usual:"Inicio: 25-75mg/noche. Titular a 150-600mg/día en 2 tomas.",
+   justificacion_tipos:{
+     nociceptivo_somatico:"No primera línea para dolor nociceptivo somático. Puede coadyuvar en dolor con componente de sensibilización.",
+     neuropatico:"Pregabalina es PRIMERA LÍNEA para dolor neuropático con registro INVIMA específico. Más potente y predecible que gabapentina. Farmacocinética lineal (absorción más predecible). Beneficio adicional ansiolítico relevante en pacientes paliativos con ansiedad comórbida. Inicio más rápido que gabapentina.",
+     mixto:"Coadyuvante de primera línea en dolor mixto para el componente neuropático. Ventaja sobre gabapentina: farmacocinética lineal, menor número de tomas (BID vs TID), efecto ansiolítico adicional.",
+     total:"En dolor total con componente neuropático y ansiedad, pregabalina ofrece doble beneficio: analgesia neuropática + efecto ansiolítico."
+   },precauciones:"Titular gradualmente. Ajustar en insuficiencia renal. Somnolencia, edema periférico, aumento de peso. No suspender abruptamente. Menor titulación requerida que gabapentina."},
+
+  {id:"amitriptilina",name:"Amitriptilina",cat:"Coadyuvante antidepresivo tricíclico",grupo:"Dolor neuropático - 1ª línea",
+   atc:"N06AA09",invima:"Registros INVIMA vigentes.",
+   presentaciones:"Tabletas 25mg.",
+   indicacion_invima:"Depresión. Dolor neuropático. Profilaxis de migraña.",
+   dosis_usual:"Inicio: 10-25mg/noche. Titular cada semana. Dosis analgésica: 25-75mg/noche.",
+   justificacion_tipos:{
+     nociceptivo_somatico:"Evidencia en dolor somático crónico por modulación descendente. Útil como coadyuvante en dolor musculoesquelético crónico.",
+     neuropatico:"Amitriptilina es PRIMERA LÍNEA para dolor neuropático (NNT 3.6). Mecanismo: inhibición dual de recaptación de serotonina y noradrenalina + bloqueo canales de sodio. Registro INVIMA para dolor neuropático. Beneficio adicional en insomnio y depresión comórbidos. Dosis analgésica menor que antidepresiva.",
+     mixto:"Coadyuvante valioso en dolor mixto con componente neuropático, especialmente si coexiste insomnio y/o depresión. Administrar en dosis nocturna única.",
+     total:"Amitriptilina aborda múltiples dimensiones del dolor total: analgesia neuropática, mejora del sueño, efecto antidepresivo. Especialmente valiosa en cuidados paliativos por su perfil multidimensional."
+   },precauciones:"Efectos anticolinérgicos (boca seca, estreñimiento, retención urinaria). Contraindicada en glaucoma de ángulo estrecho, retención urinaria, cardiopatía (prolonga QTc). Precaución en ancianos. Somnolencia: administrar en la noche."},
+
+  {id:"duloxetina",name:"Duloxetina",cat:"Coadyuvante IRSN",grupo:"Dolor neuropático - 1ª línea",
+   atc:"N06AX21",invima:"Registros INVIMA vigentes.",
+   presentaciones:"Cápsulas 30/60mg.",
+   indicacion_invima:"Depresión mayor. Dolor neuropático diabético periférico. Trastorno de ansiedad generalizada.",
+   dosis_usual:"Inicio: 30mg/día. Aumentar a 60mg/día después de 1-2 semanas.",
+   justificacion_tipos:{
+     nociceptivo_somatico:"Duloxetina tiene evidencia en dolor musculoesquelético crónico (osteoartrosis, lumbalgia crónica) por modulación de vía inhibitoria descendente.",
+     neuropatico:"Duloxetina con registro INVIMA para dolor neuropático diabético periférico. IRSN con evidencia sólida en dolor neuropático (NNT 6.4). Alternativa a amitriptilina con mejor perfil de efectos adversos en ancianos. Menos efectos anticolinérgicos.",
+     mixto:"Útil en dolor mixto con componente neuropático, especialmente en pacientes donde amitriptilina está contraindicada (ancianos, cardiopatía, retención urinaria).",
+     total:"Duloxetina aborda dolor neuropático + depresión + ansiedad. Perfil más seguro que amitriptilina en pacientes frágiles."
+   },precauciones:"Náusea inicial frecuente (titular gradualmente). No suspender abruptamente. Precaución en hepatopatía. Interacción con CYP1A2 y CYP2D6. No combinar con IMAO."},
+
+  {id:"dexametasona",name:"Dexametasona",cat:"Corticoesteroide",grupo:"Coadyuvante antiinflamatorio",
+   atc:"H02AB02",invima:"Múltiples registros INVIMA vigentes.",
+   presentaciones:"Tab 0.5/0.75/4mg. Ampolla 4mg/mL, 8mg/2mL.",
+   indicacion_invima:"Procesos inflamatorios. Edema cerebral. Antiemético.",
+   dosis_usual:"4-16mg/día VO o IV/SC según indicación. Edema cerebral: 16mg/día. Antiemético: 4-8mg.",
+   justificacion_tipos:{
+     nociceptivo_somatico:"Dexametasona indicada como coadyuvante en dolor óseo metastásico (reduce edema peritumoral e inflamación). Dosis: 4-8mg/día. También útil en compresión medular (dosis altas: 16mg/día). Registro INVIMA para procesos inflamatorios.",
+     nociceptivo_visceral:"Indicada en dolor visceral por distensión capsular hepática (hepatomegalia tumoral), obstrucción intestinal maligna (reduce edema de pared), y compresión tumoral visceral. Dosis según severidad.",
+     neuropatico:"Coadyuvante en dolor neuropático por compresión nerviosa tumoral (reduce edema perineural). Especialmente indicada en compresión medular y plexopatías tumorales. Acción rápida mientras se titulan otros coadyuvantes.",
+     mixto:"Dexametasona como coadyuvante en dolor mixto oncológico: reduce componente inflamatorio y edema perineural/peritumoral. Beneficios adicionales: mejora apetito, reduce náusea, efecto euforizante leve.",
+     irruptivo:"Puede reducir frecuencia de dolor irruptivo al disminuir edema tumoral y componente inflamatorio.",
+     total:"Dexametasona como coadyuvante multidimensional en cuidados paliativos: analgesia, antiemético, orexígeno, mejora estado general, reduce edema cerebral. Impacto positivo en múltiples dimensiones del dolor total."
+   },precauciones:"Hiperglicemia, inmunosupresión, osteoporosis, miopatía proximal, insomnio (administrar en la mañana), psicosis. Reducir dosis gradualmente si uso >7 días. Protección gástrica si asocia AINE."},
+
+  {id:"haloperidol",name:"Haloperidol",cat:"Antipsicótico",grupo:"Antiemético / Antidelirium",
+   atc:"N05AD01",invima:"Registros INVIMA vigentes.",
+   presentaciones:"Gotas 2mg/mL. Tabletas 5mg. Ampolla 5mg/mL.",
+   indicacion_invima:"Psicosis aguda y crónica. Náuseas y vómitos. Agitación psicomotora.",
+   dosis_usual:"Delirium: 0.5-2mg SC/VO c/8-12h. Antiemético: 0.5-1.5mg/noche VO/SC. Agitación: 2.5-5mg SC/IM.",
+   justificacion_tipos:{
+     nociceptivo_somatico:"No es analgésico directo. Indicado como antiemético si náusea por opioides (antagonismo D2 en zona quimiorreceptora del gatillo). Indicado en delirium que puede coexistir con dolor no controlado.",
+     neuropatico:"Sin indicación analgésica directa. Manejo del delirium asociado.",
+     mixto:"Indicado para el manejo de náusea opioide y delirium en paciente con dolor mixto bajo tratamiento opioide.",
+     total:"Haloperidol en dolor total: manejo del delirium (frecuente en enfermedad avanzada), antiemético opioide de primera línea, y agitación terminal. Registro INVIMA para náuseas/vómitos y psicosis."
+   },precauciones:"Prolonga QTc. Síntomas extrapiramidales. Dosis menores en ancianos. Vía SC bien tolerada. Sedación mínima a dosis bajas. Contraindicado en Parkinson."},
+
+  {id:"midazolam",name:"Midazolam",cat:"Benzodiazepina",grupo:"Sedación paliativa / Anticonvulsivante",
+   atc:"N05CD08",invima:"Registros INVIMA vigentes. Control especial.",
+   presentaciones:"Ampolla 5mg/mL, 15mg/3mL, 50mg/10mL.",
+   indicacion_invima:"Sedación. Inducción anestésica. Estado epiléptico.",
+   dosis_usual:"Sedación paliativa: inicio 1-2.5mg SC en bolo, luego 10-30mg/24h en infusión SC continua. Convulsiones: 5mg SC/IM.",
+   justificacion_tipos:{
+     nociceptivo_somatico:"No es analgésico. Indicado para sedación paliativa cuando el dolor es refractario a todas las intervenciones analgésicas disponibles (sedación paliativa proporcional según Ley 1733/2014).",
+     neuropatico:"Sin indicación analgésica directa. Ansiolisis en paciente con dolor neuropático y ansiedad severa.",
+     total:"Midazolam en cuidados paliativos: sedación paliativa como recurso terapéutico final ante sufrimiento refractario (dolor, disnea, agitación, angustia existencial). Marco legal: Ley 1733/2014, Resolución 2665/2018. También: crisis convulsivas, mioclonías por opioides, ansiedad severa. Vía SC permite manejo domiciliario. Documentar indicación, proporcionalidad y consentimiento."
+   },precauciones:"Sedación paliativa requiere: documentación de refractariedad, consentimiento informado, indicación por equipo paliativo, proporcionalidad. Depresión respiratoria: tener flumazenilo disponible. Paradoja: puede causar agitación paradójica (especialmente ancianos)."},
+
+  {id:"hioscina",name:"Butilbromuro de Hioscina",cat:"Anticolinérgico",grupo:"Antiespasmódico / Estertores",
+   atc:"A03BB01",invima:"Registros INVIMA vigentes.",
+   presentaciones:"Ampolla 20mg/mL. Tabletas 10mg.",
+   indicacion_invima:"Espasmos del tracto gastrointestinal y genitourinario.",
+   dosis_usual:"20mg SC/IV c/6-8h. Estertores: 20mg SC c/4-6h PRN. Obstrucción intestinal: 60-120mg/24h ISCC.",
+   justificacion_tipos:{
+     nociceptivo_visceral:"Butilbromuro de hioscina con registro INVIMA para espasmos GI y genitourinarios. Anticolinérgico cuaternario que no cruza barrera hematoencefálica (menor sedación). Primera línea en dolor tipo cólico por obstrucción intestinal maligna. Reduce secreciones GI.",
+     total:"En cuidados paliativos: manejo de estertores premortem (reduce secreciones bronquiales), dolor cólico por obstrucción intestinal maligna, espasmo vesical. No cruza BHE: no causa sedación ni delirium."
+   },precauciones:"Contraindicado en glaucoma de ángulo estrecho. Retención urinaria. Taquicardia. No usar con anticolinérgicos centrales. Vía SC bien tolerada."},
+
+  {id:"metoclopramida",name:"Metoclopramida",cat:"Procinético / Antiemético",grupo:"Antiemético",
+   atc:"A03FA01",invima:"Registros INVIMA vigentes.",
+   presentaciones:"Tab 10mg. Ampolla 10mg/2mL. Gotas.",
+   indicacion_invima:"Náuseas y vómitos. Gastroparesia. Facilitación del vaciamiento gástrico.",
+   dosis_usual:"10mg c/8h VO/SC/IV. Máx 30mg/día. Máx 5 días consecutivos por riesgo de discinesia.",
+   justificacion_tipos:{
+     nociceptivo_visceral:"Metoclopramida indicada en náusea/vómito asociado a dolor visceral y gastroparesia. Procinético: mejora vaciamiento gástrico (frecuentemente retardado en pacientes con opioides). Contraindicada en obstrucción intestinal completa.",
+     total:"Antiemético de primera línea en cuidados paliativos para náusea por opioides, gastroparesia, y estasis gástrica. Registro INVIMA vigente. Complementa el manejo del bienestar del paciente."
+   },precauciones:"Contraindicada en obstrucción intestinal completa, feocromocitoma, Parkinson. Riesgo de discinesia tardía (limitar duración). Síntomas extrapiramidales. No asociar con haloperidol (potencia síntomas extrapiramidales)."},
+
+  {id:"ondansetron",name:"Ondansetrón",cat:"Antiemético 5-HT3",grupo:"Antiemético",
+   atc:"A04AA01",invima:"Registros INVIMA vigentes.",
+   presentaciones:"Tab 4/8mg. Ampolla 4mg/2mL, 8mg/4mL. Tab sublingual.",
+   indicacion_invima:"Prevención y tratamiento de náuseas y vómitos.",
+   dosis_usual:"4-8mg c/8-12h VO/IV/SC.",
+   justificacion_tipos:{
+     nociceptivo_somatico:"No es analgésico. Antiemético para náusea refractaria a metoclopramida y haloperidol, especialmente si asociada a quimioterapia o radioterapia.",
+     total:"Ondansetrón como antiemético de segunda/tercera línea en cuidados paliativos cuando metoclopramida y haloperidol son insuficientes o contraindicados. Especialmente útil en náusea por QT/RT. Registro INVIMA para náuseas y vómitos."
+   },precauciones:"Prolonga QTc (precaución con otros QTc prolongadores). Estreñimiento (frecuente). No tiene efecto procinético. Puede usarse vía SC."},
+
+  {id:"ketamina",name:"Ketamina",cat:"Antagonista NMDA",grupo:"Dolor refractario",
+   atc:"N01AX03",invima:"Registros INVIMA vigentes. Control especial.",
+   presentaciones:"Ampolla 500mg/10mL (50mg/mL).",
+   indicacion_invima:"Anestesia general. Sedación procedural.",
+   dosis_usual:"Dolor: 0.1-0.5mg/kg/h ISCC o 10-25mg SC c/4-6h. Burst: 100-300mg/24h ISCC x 3-5 días.",
+   justificacion_tipos:{
+     nociceptivo_somatico:"Ketamina como uso fuera de indicación (off-label) en dolor somático refractario a opioides. Antagonismo NMDA revierte tolerancia opioide y sensibilización central. Uso en cuidados paliativos respaldado por guías SECPAL e IAHPC.",
+     neuropatico:"Ketamina tiene indicación específica en dolor neuropático refractario por su antagonismo NMDA. Bloquea wind-up y sensibilización central implicados en dolor neuropático crónico. Evidencia en dolor por miembro fantasma, plexopatía tumoral refractaria. Uso off-label respaldado por guías internacionales de cuidados paliativos.",
+     mixto:"Ketamina como último recurso en dolor mixto refractario. El antagonismo NMDA aborda la sensibilización central presente en dolor crónico complejo. Puede permitir reducción de dosis de opioides (efecto ahorrador).",
+     total:"Ketamina en dolor total refractario: cuando todas las intervenciones analgésicas convencionales han fracasado. Uso off-label respaldado por guías internacionales. Documentar refractariedad, consentimiento, y proporcionalidad."
+   },precauciones:"Uso off-label en dolor (indicación INVIMA: anestesia). Efectos psicomiméticos (alucinaciones, disforia): prevenir con haloperidol o midazolam en dosis bajas. Hipertensión. Contraindicada en HTA no controlada, cardiopatía isquémica, HIC."},
+
+  {id:"levomepromazina",name:"Levomepromazina",cat:"Antipsicótico / Antiemético",grupo:"Sedación / Antiemético amplio",
+   atc:"N05AA02",invima:"Registros INVIMA vigentes.",
+   presentaciones:"Gotas 40mg/mL. Tab 25/100mg. Ampolla 25mg/mL.",
+   indicacion_invima:"Psicosis. Agitación. Dolor crónico severo.",
+   dosis_usual:"Antiemético: 3-6.25mg/día SC/VO. Sedación paliativa: 12.5-25mg SC c/4-8h o 50-200mg/24h ISCC.",
+   justificacion_tipos:{
+     nociceptivo_somatico:"Levomepromazina tiene propiedades analgésicas intrínsecas (bloqueo múltiples receptores). En dolor refractario, dosis bajas pueden coadyuvar a la analgesia.",
+     total:"Levomepromazina en cuidados paliativos: antiemético de amplio espectro (bloquea D2, 5-HT2, H1, ACh), sedación paliativa (alternativa o complemento a midazolam), agitación/delirium refractario, y coadyuvante analgésico. Registro INVIMA incluye dolor crónico severo."
+   },precauciones:"Hipotensión ortostática (especialmente primera dosis). Sedación marcada a dosis altas. Vía SC puede causar irritación local. Menor riesgo extrapiramidal que haloperidol pero mayor sedación."},
+
+  {id:"lidocaina_parche",name:"Lidocaína (parche tópico 5%)",cat:"Anestésico local tópico",grupo:"Dolor neuropático localizado",
+   atc:"N01BB02",invima:"Registros INVIMA vigentes para parches tópicos.",
+   presentaciones:"Parche tópico 5% (700mg lidocaína/parche).",
+   indicacion_invima:"Dolor neuropático localizado (neuralgia postherpética).",
+   dosis_usual:"Máx 3 parches simultáneos. 12h on / 12h off. Aplicar sobre piel intacta.",
+   justificacion_tipos:{
+     neuropatico:"Lidocaína tópica 5% con registro INVIMA para dolor neuropático localizado. Bloquea canales de sodio en fibras nerviosas periféricas dañadas. Primera línea en neuralgia postherpética y dolor neuropático localizado. Mínima absorción sistémica: excelente perfil de seguridad en ancianos.",
+     mixto:"Útil como coadyuvante tópico en dolor mixto con componente neuropático localizado. No interacciones sistémicas significativas.",
+     total:"Componente tópico del manejo multimodal del dolor. Especialmente valioso en ancianos y polifarmacia por ausencia de interacciones."
+   },precauciones:"Solo en piel intacta. No en mucosas. Dermatitis local posible. Mínima absorción sistémica. No cortar parches de algunas formulaciones."}
+];
+
+// ==================== RENDER SCALES ====================
+function renderRadioScale(containerId, data, namePrefix, callback){
+  const c = document.getElementById(containerId);
+  if(!c) return;
+  c.innerHTML = '';
+  data.forEach((item,i)=>{
+    const div = document.createElement('div');
+    div.className = 'scale-option';
+    div.innerHTML = `<input type="radio" name="${namePrefix}" id="${namePrefix}_${i}" value="${item.v}" onchange="${callback}"><span class="opt-score">${item.v}</span><label for="${namePrefix}_${i}">${item.d}</label>`;
+    c.appendChild(div);
+  });
+}
+
+function renderBarthel(){
+  const c = document.getElementById('barthel-items');
+  c.innerHTML = '';
+  BARTHEL_ITEMS.forEach((item,i)=>{
+    let html = `<div style="margin-bottom:8px"><strong style="font-size:12px">${item.name}</strong><div class="scale-options">`;
+    item.opts.forEach((opt,j)=>{
+      html += `<div class="scale-option"><input type="radio" name="barthel_${i}" id="barthel_${i}_${j}" value="${opt.s}" onchange="calcBarthel()"><span class="opt-score">${opt.s}</span><label for="barthel_${i}_${j}">${opt.t}</label></div>`;
+    });
+    html += '</div></div>';
+    c.innerHTML += html;
+  });
+}
+
+function renderESAS(){
+  const c = document.getElementById('esas-items');
+  c.innerHTML = '';
+  ESAS_ITEMS.forEach(item=>{
+    c.innerHTML += `<div style="margin-bottom:14px;padding:10px;background:rgba(255,255,255,.5);border-radius:6px">
+      <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:4px">
+        <strong style="font-size:13px">${item.name}</strong>
+        <span class="eva-value" id="esas-${item.id}-val" style="font-size:22px;color:#27ae60">0</span>
+      </div>
+      <input type="range" min="0" max="10" value="0" class="eva-slider" id="esas-${item.id}" oninput="updateESASItem('${item.id}')" style="width:100%;background:linear-gradient(to right,#27ae60,#f1c40f,#c0392b)">
+      <div class="eva-labels"><span>${item.low}</span><span>${item.high}</span></div>
+    </div>`;
+  });
+}
+
+function renderDN4(){
+  const c = document.getElementById('dn4-items');
+  c.innerHTML = '';
+  let idx = 0;
+  DN4_ITEMS.forEach(cat=>{
+    c.innerHTML += `<div style="margin-bottom:10px"><strong style="font-size:12px;color:var(--primary)">${cat.cat}</strong><div class="dn4-grid">`;
+    cat.items.forEach(item=>{
+      c.innerHTML += `<div class="scale-option"><input type="checkbox" id="dn4_${idx}" onchange="calcDN4()"><label for="dn4_${idx}">${item}</label></div>`;
+      idx++;
+    });
+    c.innerHTML += '</div></div>';
+  });
+}
+
+function renderPPI(){
+  const c = document.getElementById('ppi-items');
+  c.innerHTML = '';
+  PPI_ITEMS.forEach((item,i)=>{
+    let html = `<div style="margin-bottom:8px"><strong style="font-size:12px">${item.name}</strong><div class="scale-options">`;
+    item.opts.forEach((opt,j)=>{
+      html += `<div class="scale-option"><input type="radio" name="ppi_${i}" id="ppi_${i}_${j}" value="${opt.s}" onchange="calcPPI()"><span class="opt-score">${opt.s}</span><label for="ppi_${i}_${j}">${opt.t}</label></div>`;
+    });
+    html += '</div></div>';
+    c.innerHTML += html;
+  });
+}
+
+function renderNECPAL(){
+  const c = document.getElementById('necpal-items');
+  c.innerHTML = '';
+  NECPAL_ITEMS.forEach(item=>{
+    c.innerHTML += `<div class="scale-option"><input type="checkbox" id="${item.id}" onchange="calcNECPAL()"><label for="${item.id}">${item.q}</label></div>`;
+  });
+}
+
+function renderSPICT(){
+  const c = document.getElementById('spict-items');
+  c.innerHTML = '';
+  SPICT_ITEMS.forEach((item,i)=>{
+    c.innerHTML += `<div class="scale-option"><input type="checkbox" id="spict_${i}" onchange="calcSPICT()"><label for="spict_${i}">${item}</label></div>`;
+  });
+}
+
+function renderCAM(){
+  const c = document.getElementById('cam-items');
+  c.innerHTML = '';
+  CAM_ITEMS.forEach((item,i)=>{
+    c.innerHTML += `<div class="scale-option"><input type="checkbox" id="cam_${i}" onchange="calcCAM()"><label for="cam_${i}"><strong>${item.name}</strong><br><span style="font-size:11px;color:var(--text-light)">${item.desc}</span></label></div>`;
+  });
+}
+
+function renderGlasgow(){
+  const c = document.getElementById('glasgow-items');
+  c.innerHTML = '';
+  GLASGOW_ITEMS.forEach((item,i)=>{
+    let html = `<div style="margin-bottom:8px"><strong style="font-size:12px">${item.name}</strong><div class="scale-options">`;
+    item.opts.forEach((opt,j)=>{
+      const checked = j===0?'checked':'';
+      html += `<div class="scale-option"><input type="radio" name="glasgow_${i}" id="glasgow_${i}_${j}" value="${opt.s}" ${checked} onchange="calcGlasgow()"><span class="opt-score">${opt.s}</span><label for="glasgow_${i}_${j}">${opt.t}</label></div>`;
+    });
+    html += '</div></div>';
+    c.innerHTML += html;
+  });
+}
+
+function renderNorton(){
+  const c = document.getElementById('norton-items');
+  c.innerHTML = '';
+  NORTON_ITEMS.forEach((item,i)=>{
+    let html = `<div style="margin-bottom:8px"><strong style="font-size:12px">${item.name}</strong><div class="scale-options">`;
+    item.opts.forEach((opt,j)=>{
+      const checked = j===0?'checked':'';
+      html += `<div class="scale-option"><input type="radio" name="norton_${i}" id="norton_${i}_${j}" value="${opt.s}" ${checked} onchange="calcNorton()"><span class="opt-score">${opt.s}</span><label for="norton_${i}_${j}">${opt.t}</label></div>`;
+    });
+    html += '</div></div>';
+    c.innerHTML += html;
+  });
+}
+
+function renderIDC(){
+  const c = document.getElementById('idc-items');
+  c.innerHTML = '';
+  IDC_ITEMS.forEach(cat=>{
+    c.innerHTML += `<div style="margin-bottom:10px"><strong style="font-size:12px;color:var(--primary)">${cat.cat}</strong>`;
+    cat.items.forEach((item,i)=>{
+      c.innerHTML += `<div class="scale-option"><input type="checkbox" class="idc-check" onchange="calcIDC()"><label>${item}</label></div>`;
+    });
+    c.innerHTML += '</div>';
+  });
+}
+
+// ==================== SCALE CALCULATIONS ====================
+function calcPPS(){
+  const sel = document.querySelector('input[name="pps"]:checked');
+  if(!sel) return;
+  const v = parseInt(sel.value);
+  document.getElementById('pps-result').style.display='block';
+  document.getElementById('pps-score').textContent=v;
+  let interp='';
+  if(v>=70) interp='Funcionalidad conservada. Expectativa de vida: semanas a meses.';
+  else if(v>=50) interp='Funcionalidad reducida. Expectativa: semanas. Considerar evaluación pronóstica.';
+  else if(v>=30) interp='Dependencia significativa. Expectativa: días a semanas. Fase de últimos días probable.';
+  else interp='Funcionalidad mínima/nula. Fase de agonía. Priorizar confort.';
+  document.getElementById('pps-interp').textContent=interp;
+}
+
+function calcKPS(){
+  const sel = document.querySelector('input[name="kps"]:checked');
+  if(!sel) return;
+  const v = parseInt(sel.value);
+  document.getElementById('kps-result').style.display='block';
+  document.getElementById('kps-score').textContent=v;
+  let interp='';
+  if(v>=80) interp='Capaz de actividad normal. Buen estado funcional.';
+  else if(v>=50) interp='Requiere asistencia variable. Considerar soporte paliativo.';
+  else if(v>=30) interp='Discapacidad severa. Cuidados de soporte necesarios.';
+  else interp='Estado muy grave. Priorizar confort y medidas de soporte.';
+  document.getElementById('kps-interp').textContent=interp;
+}
+
+function calcECOG(){
+  const sel = document.querySelector('input[name="ecog"]:checked');
+  if(!sel) return;
+  const v = parseInt(sel.value);
+  document.getElementById('ecog-result').style.display='block';
+  document.getElementById('ecog-score').textContent=v;
+  let interp=['Completamente funcional','Restricción leve','Ambulatorio, no puede trabajar','Capacidad limitada de autocuidado','Completamente discapacitado','Muerte'][v];
+  document.getElementById('ecog-interp').textContent=interp;
+}
+
+function calcBarthel(){
+  let total=0;
+  BARTHEL_ITEMS.forEach((item,i)=>{
+    const sel=document.querySelector(`input[name="barthel_${i}"]:checked`);
+    if(sel) total+=parseInt(sel.value);
+  });
+  document.getElementById('barthel-score').textContent=total;
+  let interp='';
+  if(total===100) interp='Independencia total';
+  else if(total>=60) interp='Dependencia leve';
+  else if(total>=40) interp='Dependencia moderada';
+  else if(total>=20) interp='Dependencia severa';
+  else interp='Dependencia total';
+  document.getElementById('barthel-interp').textContent=interp;
+}
+
+function updateESASItem(id){
+  const val=document.getElementById('esas-'+id).value;
+  const el=document.getElementById('esas-'+id+'-val');
+  el.textContent=val;
+  const colors=['#27ae60','#27ae60','#2ecc71','#f1c40f','#f1c40f','#e67e22','#e67e22','#e74c3c','#e74c3c','#c0392b','#8e0000'];
+  el.style.color=colors[val];
+  calcESASTotal();
+}
+
+function calcESASTotal(){
+  let total=0;let breakdown='';
+  ESAS_ITEMS.forEach(item=>{
+    const v=parseInt(document.getElementById('esas-'+item.id).value);
+    total+=v;
+    if(v>=4) breakdown+=`<span style="color:${v>=7?'var(--danger)':'var(--warning)'}">● ${item.name}: ${v}/10</span> `;
+  });
+  document.getElementById('esas-total').textContent=total;
+  let interp='';
+  if(total<=10) interp='Carga sintomática baja';
+  else if(total<=30) interp='Carga sintomática moderada';
+  else if(total<=50) interp='Carga sintomática alta - requiere intervención activa';
+  else interp='Carga sintomática severa - intervención urgente';
+  document.getElementById('esas-interp').textContent=interp;
+  document.getElementById('esas-breakdown').innerHTML=breakdown?'<strong>Síntomas significativos (≥4):</strong><br>'+breakdown:'';
+}
+
+function calcDN4(){
+  let total=0;
+  for(let i=0;i<10;i++){
+    const cb=document.getElementById('dn4_'+i);
+    if(cb&&cb.checked) total++;
+  }
+  document.getElementById('dn4-score').textContent=total;
+  document.getElementById('dn4-interp').textContent=total>=4?'POSITIVO para dolor neuropático (≥4/10). Sensibilidad 82.9%, Especificidad 89.9%. Iniciar/optimizar terapia coadyuvante anticonvulsivante y/o antidepresivo.':'Improbable dolor neuropático (<4/10).';
+  document.getElementById('dn4-interp').style.color=total>=4?'var(--danger)':'var(--accent)';
+}
+
+function calcPPI(){
+  let total=0;
+  PPI_ITEMS.forEach((item,i)=>{
+    const sel=document.querySelector(`input[name="ppi_${i}"]:checked`);
+    if(sel) total+=parseFloat(sel.value);
+  });
+  document.getElementById('ppi-score').textContent=total.toFixed(1);
+  let interp='';
+  if(total>6) interp='PPI >6: Supervivencia estimada < 3 semanas. Alta probabilidad de fallecimiento inminente. Priorizar confort y preparación de fase de últimos días.';
+  else if(total>=4) interp='PPI 4-6: Supervivencia estimada < 6 semanas. Considerar ajuste de objetivos terapéuticos y planificación anticipada de cuidados.';
+  else interp='PPI <4: Supervivencia estimada > 6 semanas.';
+  document.getElementById('ppi-interp').textContent=interp;
+}
+
+function calcNECPAL(){
+  const surprise=document.getElementById('necpal_sorpresa').checked;
+  let positives=0;
+  NECPAL_ITEMS.forEach(item=>{
+    if(document.getElementById(item.id).checked) positives++;
+  });
+  let interp='';
+  if(surprise && positives>=2){
+    interp='NECPAL POSITIVO (+): Paciente con necesidades paliativas identificadas. Requiere planificación anticipada de cuidados, evaluación integral de necesidades y activación de recursos paliativos.';
+  } else if(surprise){
+    interp='Pregunta sorpresa positiva. Evaluar criterios adicionales para confirmar necesidades paliativas.';
+  } else {
+    interp='NECPAL NEGATIVO (-): No se identifican necesidades paliativas según este instrumento en este momento. Reevaluar periódicamente.';
+  }
+  document.getElementById('necpal-interp').textContent=interp;
+}
+
+function calcSPICT(){
+  let total=0;
+  SPICT_ITEMS.forEach((item,i)=>{
+    if(document.getElementById('spict_'+i).checked) total++;
+  });
+  document.getElementById('spict-score').textContent=total;
+  let interp='';
+  if(total>=2) interp='Múltiples indicadores SPICT positivos. Considerar: revisión del plan de cuidados, planificación anticipada, valoración paliativa.';
+  else if(total===1) interp='Un indicador positivo. Monitorizar evolución y reevaluar.';
+  else interp='Sin indicadores positivos actualmente.';
+  document.getElementById('spict-interp').textContent=interp;
+}
+
+function calcCAM(){
+  const c1=document.getElementById('cam_0').checked;
+  const c2=document.getElementById('cam_1').checked;
+  const c3=document.getElementById('cam_2').checked;
+  const c4=document.getElementById('cam_3').checked;
+  const positive=c1&&c2&&(c3||c4);
+  document.getElementById('cam-interp').innerHTML=positive?
+    '<strong style="color:var(--danger)">CAM POSITIVO: DELIRIUM PRESENTE.</strong> Criterios 1+2+(3 ó 4) cumplidos. Iniciar búsqueda etiológica (opioides, infección, deshidratación, hipercalcemia, fármacos anticolinérgicos, retención urinaria, fecaloma). Considerar haloperidol 0.5-2mg SC/VO.':
+    'CAM negativo: No se cumplen criterios de delirium. (Requiere: criterio 1 + criterio 2 + criterio 3 ó 4)';
+}
+
+function calcGlasgow(){
+  let total=0;
+  GLASGOW_ITEMS.forEach((item,i)=>{
+    const sel=document.querySelector(`input[name="glasgow_${i}"]:checked`);
+    if(sel) total+=parseInt(sel.value);
+  });
+  document.getElementById('glasgow-score').textContent=total;
+  let interp='';
+  if(total===15) interp='Sin alteración del nivel de conciencia';
+  else if(total>=13) interp='Alteración leve';
+  else if(total>=9) interp='Alteración moderada';
+  else interp='Alteración severa';
+  document.getElementById('glasgow-interp').textContent=interp;
+}
+
+function calcNorton(){
+  let total=0;
+  NORTON_ITEMS.forEach((item,i)=>{
+    const sel=document.querySelector(`input[name="norton_${i}"]:checked`);
+    if(sel) total+=parseInt(sel.value);
+  });
+  document.getElementById('norton-score').textContent=total;
+  let interp='';
+  if(total>=15) interp='Sin riesgo de úlceras por presión';
+  else if(total>=13) interp='Riesgo medio de úlceras por presión';
+  else interp='Riesgo alto de úlceras por presión. Implementar medidas preventivas: cambios posturales c/2h, colchón antiescaras, cuidado de piel, nutrición.';
+  document.getElementById('norton-interp').textContent=interp;
+}
+
+function calcIDC(){
+  const checks=document.querySelectorAll('.idc-check:checked');
+  const total=checks.length;
+  let interp='';
+  if(total===0) interp='Situación no compleja. Manejo por atención primaria con apoyo paliativo.';
+  else if(total<=2) interp='Complejidad media. Considerar seguimiento por equipo de cuidados paliativos.';
+  else interp='Alta complejidad ('+total+' elementos). Requiere manejo por equipo especializado de cuidados paliativos. Considerar ingreso o seguimiento intensivo.';
+  document.getElementById('idc-interp').textContent=interp;
+}
+
+// ==================== MEDICATION MODULE ====================
+let prescribedMeds = [];
+
+function filterMeds(){
+  const q = document.getElementById('med-search').value.toLowerCase();
+  const dd = document.getElementById('med-dropdown');
+  if(q.length<1){dd.classList.remove('show');return;}
+  const filtered = MEDS_DB.filter(m => m.name.toLowerCase().includes(q) || m.cat.toLowerCase().includes(q) || m.grupo.toLowerCase().includes(q));
+  dd.innerHTML = '';
+  filtered.forEach(m=>{
+    dd.innerHTML += `<div class="med-dropdown-item" onclick="addMed('${m.id}')">
+      <div class="med-d-name">${m.name}</div>
+      <div class="med-d-cat">${m.cat} — ${m.grupo}</div>
+      <div class="med-d-ind">${m.indicacion_invima.substring(0,100)}...</div>
+    </div>`;
+  });
+  dd.classList.add('show');
+}
+
+function addMed(id){
+  const med = MEDS_DB.find(m=>m.id===id);
+  if(!med) return;
+  const tipoDolorSel = document.getElementById('dolor_tipo').value;
+  const entry = {
+    ...med,
+    dosis_prescrita:'',
+    via:'VO',
+    frecuencia:'',
+    observaciones:'',
+    tipo_dolor_actual: tipoDolorSel
+  };
+  prescribedMeds.push(entry);
+  document.getElementById('med-search').value='';
+  document.getElementById('med-dropdown').classList.remove('show');
+  renderPrescribedMeds();
+}
+
+function removeMed(idx){
+  prescribedMeds.splice(idx,1);
+  renderPrescribedMeds();
+}
+
+function renderPrescribedMeds(){
+  const c = document.getElementById('prescribed-meds');
+  c.innerHTML='';
+  prescribedMeds.forEach((med,idx)=>{
+    const tipoDolor = med.tipo_dolor_actual || 'nociceptivo_somatico';
+    const justText = med.justificacion_tipos[tipoDolor] || med.justificacion_tipos[Object.keys(med.justificacion_tipos)[0]] || 'Justificación no disponible para este tipo de dolor.';
+    const tipoDolorLabel = {nociceptivo_somatico:'Nociceptivo Somático',nociceptivo_visceral:'Nociceptivo Visceral',neuropatico:'Neuropático',mixto:'Mixto',irruptivo:'Irruptivo Oncológico',total:'Dolor Total'}[tipoDolor]||tipoDolor;
+    
+    c.innerHTML += `<div class="med-entry">
+      <div class="med-header">
+        <div>
+          <span class="med-name">${med.name}</span>
+          <span style="font-size:11px;color:var(--text-light);margin-left:8px">${med.cat} — ${med.grupo}</span>
+        </div>
+        <button class="med-remove" onclick="removeMed(${idx})">×</button>
+      </div>
+      <div class="form-grid cols-4">
+        <div class="form-group"><label>Dosis prescrita</label><input type="text" value="${med.dosis_prescrita}" onchange="prescribedMeds[${idx}].dosis_prescrita=this.value" placeholder="${med.dosis_usual.substring(0,40)}..."></div>
+        <div class="form-group"><label>Vía</label>
+          <select onchange="prescribedMeds[${idx}].via=this.value">
+            <option ${med.via==='VO'?'selected':''}>VO</option><option ${med.via==='SC'?'selected':''}>SC</option>
+            <option ${med.via==='IV'?'selected':''}>IV</option><option ${med.via==='TD'?'selected':''}>TD</option>
+            <option ${med.via==='SL'?'selected':''}>SL</option><option ${med.via==='IM'?'selected':''}>IM</option>
+            <option ${med.via==='Tópica'?'selected':''}>Tópica</option>
+          </select></div>
+        <div class="form-group"><label>Frecuencia</label><input type="text" value="${med.frecuencia}" onchange="prescribedMeds[${idx}].frecuencia=this.value" placeholder="Ej: c/8h, c/12h, c/72h"></div>
+        <div class="form-group"><label>Tipo de dolor</label>
+          <select onchange="prescribedMeds[${idx}].tipo_dolor_actual=this.value;renderPrescribedMeds()">
+            <option value="nociceptivo_somatico" ${tipoDolor==='nociceptivo_somatico'?'selected':''}>Nociceptivo somático</option>
+            <option value="nociceptivo_visceral" ${tipoDolor==='nociceptivo_visceral'?'selected':''}>Nociceptivo visceral</option>
+            <option value="neuropatico" ${tipoDolor==='neuropatico'?'selected':''}>Neuropático</option>
+            <option value="mixto" ${tipoDolor==='mixto'?'selected':''}>Mixto</option>
+            <option value="irruptivo" ${tipoDolor==='irruptivo'?'selected':''}>Irruptivo oncológico</option>
+            <option value="total" ${tipoDolor==='total'?'selected':''}>Dolor total</option>
+          </select></div>
+      </div>
+      <div class="form-group" style="margin-top:6px"><label>Observaciones</label><input type="text" value="${med.observaciones}" onchange="prescribedMeds[${idx}].observaciones=this.value"></div>
+      
+      <div class="justification-box">
+        <div class="just-title">
+          Justificación clínica — ${tipoDolorLabel}
+          <span class="invima-badge" style="margin-left:8px">✓ INVIMA</span>
+        </div>
+        <div class="just-content">${justText}</div>
+        <div style="margin-top:6px;font-size:11px;color:var(--text-light)">
+          <strong>Registro INVIMA:</strong> ${med.invima}<br>
+          <strong>Indicación aprobada:</strong> ${med.indicacion_invima.substring(0,150)}<br>
+          <strong>ATC:</strong> ${med.atc} | <strong>Presentaciones:</strong> ${med.presentaciones}<br>
+          <strong>Dosis usual:</strong> ${med.dosis_usual}<br>
+          <strong>Precauciones:</strong> ${med.precauciones}
+        </div>
+      </div>
+    </div>`;
+  });
+}
+
+// ==================== RESUMEN ESCALAS ====================
+function updateResumenEscalas(){
+  let html = '<table style="width:100%;border-collapse:collapse;font-size:12px">';
+  html += '<tr style="background:var(--primary);color:#fff"><th style="padding:6px;text-align:left">Escala</th><th style="padding:6px">Resultado</th><th style="padding:6px;text-align:left">Interpretación</th></tr>';
+  
+  const scales = [
+    {name:'PPS',scoreId:'pps-score',interpId:'pps-interp',suffix:'%'},
+    {name:'Karnofsky',scoreId:'kps-score',interpId:'kps-interp',suffix:'%'},
+    {name:'ECOG',scoreId:'ecog-score',interpId:'ecog-interp',suffix:''},
+    {name:'Barthel',scoreId:'barthel-score',interpId:'barthel-interp',suffix:'/100'},
+    {name:'ESAS Total',scoreId:'esas-total',interpId:'esas-interp',suffix:'/100'},
+    {name:'EVA Reposo',scoreId:'eva-rest-val',interpId:null,suffix:'/10'},
+    {name:'EVA Movimiento',scoreId:'eva-mov-val',interpId:null,suffix:'/10'},
+    {name:'DN4',scoreId:'dn4-score',interpId:'dn4-interp',suffix:'/10'},
+    {name:'PPI',scoreId:'ppi-score',interpId:'ppi-interp',suffix:''},
+    {name:'Glasgow',scoreId:'glasgow-score',interpId:'glasgow-interp',suffix:'/15'},
+    {name:'Norton',scoreId:'norton-score',interpId:'norton-interp',suffix:'/20'}
+  ];
+  
+  scales.forEach((s,i)=>{
+    const bg = i%2===0?'#f8f9fa':'#fff';
+    const score = document.getElementById(s.scoreId)?.textContent||'--';
+    const interp = s.interpId?document.getElementById(s.interpId)?.textContent||'':'';
+    html += `<tr style="background:${bg}"><td style="padding:6px;font-weight:600">${s.name}</td><td style="padding:6px;text-align:center;font-weight:700;color:var(--primary)">${score}${s.suffix}</td><td style="padding:6px">${interp.substring(0,80)}</td></tr>`;
+  });
+  html += '</table>';
+  document.getElementById('resumen-escalas').innerHTML = html;
+}
+
+// ==================== STORAGE ====================
+function saveToStorage(){
+  const data = {prescribedMeds, timestamp: new Date().toISOString()};
+  document.querySelectorAll('input:not([type="radio"]):not([type="checkbox"]):not([type="range"]),textarea,select').forEach(el=>{
+    if(el.id) data[el.id]=el.value;
+  });
+  // Save radios
+  document.querySelectorAll('input[type="radio"]:checked').forEach(el=>{
+    data['radio_'+el.name]=el.value;
+  });
+  document.querySelectorAll('input[type="checkbox"]:checked').forEach(el=>{
+    if(el.id) data['check_'+el.id]=true;
+  });
+  // Save ranges
+  document.querySelectorAll('input[type="range"]').forEach(el=>{
+    if(el.id) data['range_'+el.id]=el.value;
+  });
+  localStorage.setItem('hc_paliativos', JSON.stringify(data));
+  alert('✅ Historia clínica guardada exitosamente en almacenamiento local.');
+}
+
+function loadFromStorage(){
+  const raw = localStorage.getItem('hc_paliativos');
+  if(!raw) return;
+  try{
+    const data = JSON.parse(raw);
+    Object.keys(data).forEach(key=>{
+      if(key==='prescribedMeds'){prescribedMeds=data[key];renderPrescribedMeds();return;}
+      if(key==='timestamp') return;
+      if(key.startsWith('radio_')){
+        const name=key.replace('radio_','');
+        const el=document.querySelector(`input[name="${name}"][value="${data[key]}"]`);
+        if(el) el.checked=true;
+        return;
+      }
+      if(key.startsWith('check_')){
+        const id=key.replace('check_','');
+        const el=document.getElementById(id);
+        if(el) el.checked=true;
+        return;
+      }
+      if(key.startsWith('range_')){
+        const id=key.replace('range_','');
+        const el=document.getElementById(id);
+        if(el){el.value=data[key];}
+        return;
+      }
+      const el=document.getElementById(key);
+      if(el) el.value=data[key];
+    });
+  }catch(e){console.error('Error loading:',e)}
+}
+
+function clearForm(){
+  if(!confirm('¿Está seguro de que desea crear una nueva historia clínica? Se perderán los datos no guardados.')) return;
+  localStorage.removeItem('hc_paliativos');
+  location.reload();
+}
+
+function exportPDF(){
+  // Show all tabs for complete PDF export
+  const allTabs = document.querySelectorAll('.tab-content');
+  const allNavs = document.querySelectorAll('.nav-tab');
+  
+  // Store current state
+  const activeTabId = document.querySelector('.tab-content.active')?.id;
+  
+  // Update resumen escalas before export
+  updateResumenEscalas();
+  
+  // Show all tabs
+  allTabs.forEach(tab => {
+    tab.classList.add('active');
+    tab.style.display = 'block';
+  });
+  
+  // Add print class to body
+  document.body.classList.add('printing-pdf');
+  
+  // Set page title with patient name for PDF filename
+  const n1 = document.getElementById('nombre1').value || '';
+  const a1 = document.getElementById('apellido1').value || '';
+  const fecha = new Date().toISOString().split('T')[0];
+  const originalTitle = document.title;
+  if(n1 || a1) document.title = `HC_Paliativos_${a1}_${n1}_${fecha}`;
+  
+  // Print (browser will offer Save as PDF)
+  setTimeout(()=>{
+    window.print();
+    // Restore after print
+    setTimeout(()=>{
+      document.body.classList.remove('printing-pdf');
+      allTabs.forEach(tab => {
+        tab.classList.remove('active');
+        tab.style.display = '';
+      });
+      // Restore active tab
+      if(activeTabId){
+        document.getElementById(activeTabId).classList.add('active');
+      }
+      document.title = originalTitle;
+    }, 500);
+  }, 300);
+}
+
+// ==================== INIT ====================
+function init(){
+  renderRadioScale('pps-options',PPS_DATA,'pps','calcPPS()');
+  renderRadioScale('kps-options',KPS_DATA,'kps','calcKPS()');
+  renderRadioScale('ecog-options',ECOG_DATA,'ecog','calcECOG()');
+  renderBarthel();
+  renderESAS();
+  renderDN4();
+  renderPPI();
+  renderNECPAL();
+  renderSPICT();
+  renderCAM();
+  renderGlasgow();
+  renderNorton();
+  renderIDC();
+  // Set fecha_atencion to now
+  const now = new Date();
+  document.getElementById('fecha_atencion').value = now.toISOString().slice(0,16);
+  // Init EVA sliders
+  ['rest','mov','irr'].forEach(t=>updateEVA(t));
+  // Load saved data
+  loadFromStorage();
+  // Recalculate computed fields after load
+  calcEdad();
+  calcESASTotal();
+  calcGlasgow();
+  calcNorton();
+  // Close dropdown on outside click
+  document.addEventListener('click',e=>{
+    if(!e.target.closest('.med-selector')) document.getElementById('med-dropdown').classList.remove('show');
+  });
+  // Calc IMC on weight/height change
+  ['sv_peso','sv_talla'].forEach(id=>{
+    document.getElementById(id).addEventListener('change',()=>{
+      const p=parseFloat(document.getElementById('sv_peso').value);
+      const t=parseFloat(document.getElementById('sv_talla').value)/100;
+      if(p&&t) document.getElementById('sv_imc').value=(p/(t*t)).toFixed(1);
+    });
+  });
+}
+
+document.addEventListener('DOMContentLoaded', init);
+</script>
+</body>
+</html>
